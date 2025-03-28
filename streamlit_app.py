@@ -264,9 +264,8 @@ def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
 
         model = get_llm_models(model_id, parameters, project_id)
         agent_generated_response = model.generate_text(prompt=agent_prompt_input)
-        #agent_result = (agent_generated_response+" ")[:agent_generated_response.find("Input:")]
-        #print(agent_result)
-        agent_result_json = json.loads(extract_json_string(agent_generated_response))
+        agent_result = extract_json_string(agent_generated_response)
+        agent_result_json = json.loads(agent_result)
 
         agent_name = agent_result_json['worker_agent']['name']
         agent_role = agent_result_json['worker_agent']['role']
@@ -420,8 +419,7 @@ def getExampleSet(setName):
     if setName == 'Example1':
         ucName = 'Automated Smart Test Assistant'
         businessProfile= 'A software assurance provider which provides services on software testing including web applications, smart assistants, chatbots, etc. The organization specializes in automating test case scenario generation for Generative AI based smart assistants. They use Generative AI large language models to generate test cases ensuring a full coverage of the knowledge base'
-        businessRules = '''
-1. Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base. Use the knowledge base to execute the below steps.
+        businessRules = '''1. Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base. Use the knowledge base to execute the below steps.
 
 2. Generate test scenarios based on the knowledge base. Test scenarios must cover a wide range of user queries to ensure maximum coverage. Test scenarios should include variations of user queries to account for different user interaction patterns.
 a) Generate only 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots.
@@ -436,8 +434,7 @@ b) Generate 3 answer variations for the each of the 5 generated questions provid
     else :
         ucName = 'Product Review System'
         businessProfile= 'A new age e-commerse serving the needs of today’s smart and value seeking customers. It offers a one-stop shopping experience by offering fresh produce, bakery, dairy products, home and personal care products, general merchandise, smart apparels and appliances, making it a complete shopping destination.'
-        businessRules = '''
-1. Analyze the reviews given by customers and classify each of the review into the following categories:
+        businessRules = '''1. Analyze the reviews given by customers and classify each of the review into the following categories:
 Positive
 Neutral
 Negative
