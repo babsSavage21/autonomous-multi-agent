@@ -232,18 +232,18 @@ Output:"""
     model = get_llm_models(model_id, parameters, project_id)
     ma_generated_response = model.generate_text(prompt=prompt_input)
     ma_result = (ma_generated_response+" ")[:ma_generated_response.find("Input:")]
-    final_dir_config = ''
+    final_ma_config = ''
     ma_result_json = json.loads(extract_json_string(ma_result))
 
     for val in ma_result_json['worker_agents']:
-        actors_name = val['name']
-        actors_task = val['task']
-        final_dir_config += "Worker Agent: " + actors_name + "\n" + "Task: " + actors_task + "\n\n"
+        worker_agent_name = val['name']
+        worker_agent_task = val['task']
+        final_ma_config += "Worker Agent: " + worker_agent_name + "\n" + "Task: " + worker_agent_task + "\n\n"
 
     
     ma_resp_json = {
             "type":"Master Agent",
-            "value":"Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):" + "\n\n" + final_dir_config,
+            "value":"Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):" + "\n\n" + final_ma_config,
             "maResult": ma_result_json
             }
     final_ma_resp_json=ma_resp_json
@@ -286,14 +286,14 @@ def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
 def task_prompt_output(companyProfile, ma_result, agent_result):
     
     final_task_result = []
-    dir_data = ma_result['worker_agents']
+    ma_data = ma_result['worker_agents']
     final_task_config = ''
 
     agent_result_data = [json.loads(agent.strip())['worker_agent'] for agent in agent_result]
 
-    for dir_agent, result_agent in zip(dir_data, agent_result_data): 
-        task_name = dir_agent['name']
-        task_description = dir_agent['task_description']
+    for master_agent, result_agent in zip(ma_data, agent_result_data): 
+        task_name = master_agent['name']
+        task_description = master_agent['task_description']
         role = result_agent['role']        
         name = result_agent['name']
         goal = result_agent['goal']
@@ -510,12 +510,11 @@ else :
         agentResp = worker_agents_prompt_output(businessProfile, businessRules, masterAgentResp['maResult'])
         taskResp = task_prompt_output(businessProfile, masterAgentResp['maResult'], agentResp['agentResult'])          
         finalOutput = multi_agent_crew(5, masterAgentResp['maResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)         
-        print(finalOutput)
         st.divider()
         st.header("Execution", divider="gray")
 
-        dirRespCol, agentRespCol, taskRespCol = st.columns(3)
-        with dirRespCol:
+        maRespCol, agentRespCol, taskRespCol = st.columns(3)
+        with maRespCol:
             with st.container():
                 st.subheader("Master Agent")
             with st.container(height=250, border=True):
