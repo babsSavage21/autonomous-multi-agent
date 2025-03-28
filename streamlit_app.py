@@ -160,7 +160,7 @@ def extract_json_string(text):
 
 def get_agent_prompt_input(inputData):
     prompt_input = f"""You are an autonomous AI application. Based on the company profile and task define the worker agent with its role, goal and backstory in JSON format. Generate only the JSON output. Do not provide any explanation or notes.
-
+```JSON
 {{
   "worker_agent": {{
     "name": "",
@@ -169,7 +169,7 @@ def get_agent_prompt_input(inputData):
     "backstory": ""
   }}
 }}
-
+```
 Input: {inputData}
 Output:"""
     return prompt_input
@@ -264,9 +264,9 @@ def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
 
         model = get_llm_models(model_id, parameters, project_id)
         agent_generated_response = model.generate_text(prompt=agent_prompt_input)
-        agent_result = (agent_generated_response+" ")[:agent_generated_response.find("Input:")]
-        print(agent_result)
-        agent_result_json = json.loads(agent_result)
+        #agent_result = (agent_generated_response+" ")[:agent_generated_response.find("Input:")]
+        #print(agent_result)
+        agent_result_json = json.loads(extract_json_string(agent_generated_response))
 
         agent_name = agent_result_json['worker_agent']['name']
         agent_role = agent_result_json['worker_agent']['role']
