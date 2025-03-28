@@ -16,6 +16,10 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 model_id = "ibm/granite-3-2-8b-instruct"
 project_id = '7e4954e5-30e3-47a3-a156-c8b3b84da7e9'
 
