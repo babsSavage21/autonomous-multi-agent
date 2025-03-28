@@ -510,7 +510,7 @@ else :
         agentResp = worker_agents_prompt_output(businessProfile, businessRules, masterAgentResp['maResult'])
         taskResp = task_prompt_output(businessProfile, masterAgentResp['maResult'], agentResp['agentResult'])          
         finalOutput = multi_agent_crew(5, masterAgentResp['maResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)         
-
+        print(finalOutput)
         st.divider()
         st.header("Execution", divider="gray")
 
