@@ -273,10 +273,7 @@ def director_prompt_output(companyProfile, BusinessRule):
 
 Input: {dir_prompt_input1}
 Output:"""
-    ## For Director prompt
-    # dir_prompt_input = self.get_director_prompt_input()
-    # dir_prompt_input = dir_prompt_input + "\nInput: \n"+ dir_prompt_input1 +"\nOutput:"
-    
+  
     model = get_llm_models(model_id, parameters, project_id)
     dir_generated_response = model.generate_text(prompt=prompt_input)
     dir_result = (dir_generated_response+" ")[:dir_generated_response.find("Input:")]
@@ -288,9 +285,6 @@ Output:"""
         actors_task = val['task']
         final_dir_config += "Worker Agent: " + actors_name + "\n" + "Task: " + actors_task + "\n\n"
 
-    # final_dir_config_new = final_dir_config.replace("agent", "actor")
-    # final_dir_config = final_dir_config_new.replace("Agent", "Actor")
-    # final_dir_config = final_dir_config.replace("AGENT", "ACTOR")
     
     dir_resp_json = {
             "type":"Master Agent",
@@ -313,7 +307,7 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
         agent_desc = val['task_description']
         agent_output = val['task_output']
         agent_prompt_input1 = "##Company Profile##\n" +  companyProfile  + "\n\n##Business Rule##\n" + BusinessRule + "\n\n##Worker Agent Name##\n"  +agent_name + "\n\n##Task Name##\n" + agent_task + "\n\n##Task Description##\n" + agent_desc + "\n\n##Task Output##\n" + agent_output
-        agent_prompt_input = self.get_agent_prompt_input(agent_prompt_input1)
+        agent_prompt_input = get_agent_prompt_input(agent_prompt_input1)
 
         model = get_llm_models(model_id, parameters, project_id)
         agent_generated_response = model.generate_text(prompt=agent_prompt_input)
@@ -325,9 +319,6 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
         agent_goal = agent_result_json['worker_agent']['goal']
         final_agent_config += agent_name.upper() + "\n" + "Role: " + agent_role + "\n" + "Goal: " + agent_goal + "\n\n"
 
-        # final_agent_config_new = final_agent_config.replace("agent", "actor")
-        # final_agent_config = final_agent_config_new.replace("Agent", "Actor")
-        # final_agent_config = final_agent_config.replace("AGENT", "ACTOR")
 
         final_agent_result.append(agent_result)
 
@@ -359,12 +350,12 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
         
         task_prompt_input1 = "##Company Profile##\n" +  companyProfile  + "\n\n##Worker Agent##\n" + name + "\n\n##Worker Agent Role##\n"  + role + "\n\n##Worker Agent Goal##\n" + goal + "\n\n##Worker Agent Backstory##\n" + backstory + "\n\n##Task Name##\n" + task_name + "\n\n##Task Description##\n" + task_description
 
-        task_prompt_input = self.get_task_prompt_input(task_prompt_input1)
+        task_prompt_input = get_task_prompt_input(task_prompt_input1)
         # task_prompt_input = task_prompt_input + "\nInput: \n"+ task_prompt_input1 +"\nOutput:"
         # model_id = "meta-llama/llama-3-3-70b-instruct"
         model = get_llm_models(model_id, parameters, project_id)
         task_generated_response = model.generate_text(prompt=task_prompt_input)
-        task_generated_response = self.extract_json_string(task_generated_response)
+        task_generated_response = extract_json_string(task_generated_response)
         task_result = (task_generated_response+" ")[:task_generated_response.find("Input:")]
 
         task_result_json = json.loads(task_result)
