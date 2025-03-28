@@ -6,11 +6,9 @@ sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import json
 import os
-from flask import Flask, request, send_from_directory,jsonify
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai_tools import (
-    FileReadTool,
-    SerperDevTool
+    FileReadTool
 )
 from crewai.tools import tool
 from textwrap import dedent
@@ -243,9 +241,9 @@ Input: {inputData}
 Output:"""
     return prompt_input
 
-def director_prompt_output(companyProfile, BusinessRule): 
+def master_agent_prompt_output(companyProfile, BusinessRule): 
 
-    dir_prompt_input1 = "##Company Profile##\n" +  companyProfile + "\n\n##Business Rule##\n" + BusinessRule       
+    ma_prompt_input1 = "##Company Profile##\n" +  companyProfile + "\n\n##Business Rule##\n" + BusinessRule       
     prompt_input = f"""You are an autonomous AI application. Based on the company profile and business rules identify the worker agents, task, task description including the business conditions and expected output. The output should be in below JSON format with the worker agents, task description and expected output for each agent.
 
 ```json
@@ -273,37 +271,36 @@ def director_prompt_output(companyProfile, BusinessRule):
 }}
 ```
 
-Input: {dir_prompt_input1}
+Input: {ma_prompt_input1}
 Output:"""
   
     model = get_llm_models(model_id, parameters, project_id)
-    dir_generated_response = model.generate_text(prompt=prompt_input)
-    dir_result = (dir_generated_response+" ")[:dir_generated_response.find("Input:")]
+    ma_generated_response = model.generate_text(prompt=prompt_input)
+    ma_result = (ma_generated_response+" ")[:ma_generated_response.find("Input:")]
     final_dir_config = ''
-    dir_result_json = json.loads(extract_json_string(dir_result))
+    ma_result_json = json.loads(extract_json_string(ma_result))
 
-    for val in dir_result_json['worker_agents']:
+    for val in ma_result_json['worker_agents']:
         actors_name = val['name']
         actors_task = val['task']
         final_dir_config += "Worker Agent: " + actors_name + "\n" + "Task: " + actors_task + "\n\n"
 
     
-    dir_resp_json = {
+    ma_resp_json = {
             "type":"Master Agent",
             "value":"Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):" + "\n\n" + final_dir_config,
-            "dirResult": dir_result_json
+            "maResult": ma_result_json
             }
-    final_dir_resp_json=dir_resp_json
+    final_ma_resp_json=ma_resp_json
 
-    return final_dir_resp_json
+    return final_ma_resp_json
 
-def agents_prompt_output(companyProfile, BusinessRule, dir_result):
+def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
     
-    #dir_result = json.loads(dir_result)
     final_agent_result = []
     final_agent_config = ''
 
-    for val in dir_result["worker_agents"]: 
+    for val in ma_result["worker_agents"]: 
         agent_name = val['name']
         agent_task = val['task']
         agent_desc = val['task_description']
@@ -319,25 +316,24 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
         agent_name = agent_result_json['worker_agent']['name']
         agent_role = agent_result_json['worker_agent']['role']
         agent_goal = agent_result_json['worker_agent']['goal']
-        final_agent_config += agent_name.upper() + "\n" + "Role: " + agent_role + "\n" + "Goal: " + agent_goal + "\n\n"
+        final_agent_config += agent_name.upper() + "\n\n" + "Role: " + agent_role + "\n\n" + "Goal: " + agent_goal + "\n\n\n"
 
 
         final_agent_result.append(agent_result)
 
     agent_resp_json = {
             "type":"Worker Agent",
-            "value":"The Master Agent initialized the following Actor(s) with their roles and goals:" + "\n\n" + final_agent_config,
+            "value":"The Master Agent initialized the following Worker Agent(s) with their roles and goals:" + "\n\n\n" + final_agent_config,
             "agentResult": final_agent_result
             }
     final_agent_resp_json=agent_resp_json
 
     return final_agent_resp_json
 
-def task_prompt_output(companyProfile, dir_result, agent_result):
+def task_prompt_output(companyProfile, ma_result, agent_result):
     
     final_task_result = []
-    #dir_result = json.loads(dir_result)
-    dir_data = dir_result['worker_agents']
+    dir_data = ma_result['worker_agents']
     final_task_config = ''
 
     agent_result_data = [json.loads(agent.strip())['worker_agent'] for agent in agent_result]
@@ -353,8 +349,6 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
         task_prompt_input1 = "##Company Profile##\n" +  companyProfile  + "\n\n##Worker Agent##\n" + name + "\n\n##Worker Agent Role##\n"  + role + "\n\n##Worker Agent Goal##\n" + goal + "\n\n##Worker Agent Backstory##\n" + backstory + "\n\n##Task Name##\n" + task_name + "\n\n##Task Description##\n" + task_description
 
         task_prompt_input = get_task_prompt_input(task_prompt_input1)
-        # task_prompt_input = task_prompt_input + "\nInput: \n"+ task_prompt_input1 +"\nOutput:"
-        # model_id = "meta-llama/llama-3-3-70b-instruct"
         model = get_llm_models(model_id, parameters, project_id)
         task_generated_response = model.generate_text(prompt=task_prompt_input)
         task_generated_response = extract_json_string(task_generated_response)
@@ -363,7 +357,7 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
 
         task_desc = task_result_json['task_description']
         task_exp_output = task_result_json['expected_output']
-        final_task_config += role.upper() + "\n" + "Description: " + "\n" + task_desc + "\n\n" + "Expected Output: " + "\n" + str(task_exp_output) + "\n\n\n"
+        final_task_config += role.upper() + "\n\n" + "Description: " + "\n" + task_desc + "\n\n" + "Expected Output: " + "\n" + str(task_exp_output) + "\n\n\n\n"
 
         final_task_result.append(task_result)
         
@@ -377,7 +371,7 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
 
     return final_task_resp_json
 
-def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):     
+def multi_agent_crew(max_iter, maResult, agentResult, taskResult, userQuery):     
     try:
         llm = LLM(
             model="watsonx/ibm/granite-3-2-8b-instruct",
@@ -389,7 +383,7 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
             project_id = project_id
         )
       
-        agent_result = agentResult#agents_prompt_output(companyProfile, dir_result, llm)
+        agent_result = agentResult
         currentAgents = []
 
         for json_str in agent_result:
@@ -404,7 +398,7 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
             verbose=True,
             ))
 
-        task_result = taskResult  #task_prompt_output(companyProfile, dir_result, agent_result)
+        task_result = taskResult
         currentTaks=[]
 
         for idx, currTask in enumerate(task_result):
@@ -430,7 +424,6 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
         tasks=currentTaks,
         verbose=True,
         full_output=True,
-        # output_log_file=True,
         output_log_file = 'logs_new.json',
         process=Process.sequential
         )
@@ -459,31 +452,34 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
 
 def getExampleSet(setName):
     if setName == 'Example1':
-        ucName = ''
-        businessProfile= ''
-        businessRules = ''
-        inputData = ''
-        directorResp = {'type': 'Master Agent', 'value': 'Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):\n\nWorker Agent: Knowledge Base Extraction Agent\nTask: Extract Knowledge Base\n\nWorker Agent: Test Scenario Generation Agent\nTask: Generate Test Scenarios\n\nWorker Agent: Smart Assistant Simulation Agent\nTask: Simulate Smart Assistant\n\nWorker Agent: Semantic Similarity Agent\nTask: Evaluate Test Scenarios\n\n', 'dirResult': {'worker_agents': [{'name': 'Knowledge Base Extraction Agent', 'task': 'Extract Knowledge Base', 'task_description': 'Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base.', 'task_output': 'The extracted content of the file as the knowledge base.'}, {'name': 'Test Scenario Generation Agent', 'task': 'Generate Test Scenarios', 'task_description': 'Generate 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots. Generate 3 answer variations for each of the 5 generated questions using the knowledge base.', 'task_output': '5 questions with 3 variations each and 3 answer variations for each of the 5 questions.'}, {'name': 'Smart Assistant Simulation Agent', 'task': 'Simulate Smart Assistant', 'task_description': 'Simulate a smart assistant and execute the 5 test scenarios generated in step 1. Generate answers for each of the test scenario and assign the generated answers as smart assistant answers. The generated answers should not match the 3 answer variations generated in step 1(b) but it should be factually correct.', 'task_output': 'Answers generated for each of the 5 test scenarios.'}, {'name': 'Semantic Similarity Agent', 'task': 'Evaluate Test Scenarios', 'task_description': 'After execution of the test scenarios in step 2, do a semantic similarity of the answers generated for each test scenario with the ground truth answers generated in step 1. Based on the semantic similarity score mark the test scenarios as PASS or FAIL assuming the threshold value of 0.7.', 'task_output': 'PASS or FAIL for each of the 5 test scenarios.'}]}}
-        agentResp = {'type': 'Worker Agent', 'value': "The Master Agent initialized the following Actor(s) with their roles and goals:\n\nKNOWLEDGE BASE EXTRACTION AGENT\nRole: Extracts and processes the knowledge base from the provided file.\nGoal: To accurately extract the content of the file and assign it as the knowledge base for further processing.\n\nTEST SCENARIO GENERATION AGENT\nRole: AI Application Specialized in Generating Test Scenarios for Generative AI based Smart Assistants\nGoal: To generate a set of 5 questions with 3 variations each and 3 answer variations for each of the 5 questions based on the provided knowledge base, ensuring maximum coverage of user queries and variations in user interaction patterns.\n\nSMART ASSISTANT SIMULATION AGENT\nRole: Smart Assistant Simulator\nGoal: To simulate a smart assistant and generate answers for 5 test scenarios based on the knowledge base, ensuring the answers are factually correct and not matching the predefined answer variations.\n\nSEMANTIC SIMILARITY AGENT\nRole: Evaluates the semantic similarity of the smart assistant's responses to the ground truth answers and marks the test scenarios as PASS or FAIL\nGoal: To ensure the smart assistant's responses are factually correct and semantically similar to the ground truth answers\n\n", 'agentResult': ['\n{\n"worker_agent": {\n"name": "Knowledge Base Extraction Agent",\n"role": "Extracts and processes the knowledge base from the provided file.",\n"goal": "To accurately extract the content of the file and assign it as the knowledge base for further processing.",\n"backstory": "This agent is designed to handle the initial step of fetching and processing the knowledge base from a given file, ensuring that the subsequent stages of test scenario generation and execution can be carried out effectively."\n}\n}', '\n\n{\n"worker_agent": {\n"name": "Test Scenario Generation Agent",\n"role": "AI Application Specialized in Generating Test Scenarios for Generative AI based Smart Assistants",\n"goal": "To generate a set of 5 questions with 3 variations each and 3 answer variations for each of the 5 questions based on the provided knowledge base, ensuring maximum coverage of user queries and variations in user interaction patterns.",\n"backstory": "This agent is an autonomous AI application designed to specialize in generating test scenarios for Generative AI based smart assistants. It uses Generative AI large language models to generate test cases, ensuring full coverage of the knowledge base. The agent is trained to create colloquial questions imitating user queries in chatbots and generate factually correct answers that do not match the predefined answer variations."\n}\n}', '\n{\n"worker_agent": {\n"name": "Smart Assistant Simulation Agent",\n"role": "Smart Assistant Simulator",\n"goal": "To simulate a smart assistant and generate answers for 5 test scenarios based on the knowledge base, ensuring the answers are factually correct and not matching the predefined answer variations.",\n"backstory": "The Smart Assistant Simulation Agent is an autonomous AI application designed to mimic the behavior of a smart assistant. It is trained to understand and respond to a wide range of user queries related to software testing services, particularly in the domain of Generative AI-based smart assistants. The agent\'s primary goal is to ensure maximum coverage of user queries by generating colloquial test scenarios and providing accurate, non-predefined responses."\n}\n}', '\n{\n"worker_agent": {\n"name": "Semantic Similarity Agent",\n"role": "Evaluates the semantic similarity of the smart assistant\'s responses to the ground truth answers and marks the test scenarios as PASS or FAIL",\n"goal": "To ensure the smart assistant\'s responses are factually correct and semantically similar to the ground truth answers",\n"backstory": "The Semantic Similarity Agent is an autonomous AI application designed to evaluate the performance of smart assistants by comparing their responses to a set of predefined ground truth answers. It uses semantic similarity algorithms to determine if the assistant\'s answers are factually correct and contextually relevant. The agent was developed to ensure the high quality and accuracy of the software testing process for Generative AI-based smart assistants."\n}\n}']}
-        taskResp = {'type': 'actor_task', 'value': 'The Master Agent assigned the following task(s):\n\nEXTRACTS AND PROCESSES THE KNOWLEDGE BASE FROM THE PROVIDED FILE.\nDescription: \nFetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base.\n\nExpected Output: \nThe extracted content of the file.\n\n\nAI APPLICATION SPECIALIZED IN GENERATING TEST SCENARIOS FOR GENERATIVE AI BASED SMART ASSISTANTS\nDescription: \nGenerate 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots. Generate 3 answer variations for each of the 5 generated questions using the knowledge base.\n\nExpected Output: \nA JSON object containing 5 questions with 3 variations each and 3 answer variations for each of the 5 questions. The format should be as follows:\n{\n  "questions": [\n    {\n      "question": "question_text",\n      "variations": [\n        "variation_1",\n        "variation_2",\n        "variation_3"\n      ]\n    },\n    ...\n  ],\n  "answers": [\n    {\n      "question": "question_text",\n      "answer": "answer_text"\n    },\n    ...\n  ]\n}\n\n\nSMART ASSISTANT SIMULATOR\nDescription: \nSimulate a smart assistant and execute the 5 test scenarios generated in step 1. Generate answers for each of the test scenario and assign the generated answers as smart assistant answers. The generated answers should not match the 3 answer variations generated in step 1(b) but it should be factually correct.\n\nExpected Output: \n5 distinct answers for each test scenario, in plain text format, that are factually correct and do not match the predefined answer variations.\n\n\nEVALUATES THE SEMANTIC SIMILARITY OF THE SMART ASSISTANT\'S RESPONSES TO THE GROUND TRUTH ANSWERS AND MARKS THE TEST SCENARIOS AS PASS OR FAIL\nDescription: \nAfter execution of the test scenarios in step 2, do a semantic similarity of the answers generated for each test scenario with the ground truth answers generated in step 1. Based on the semantic similarity score mark the test scenarios as PASS or FAIL assuming the threshold value of 0.7. Output: A JSON object containing the test scenario ID, the smart assistant\'s response, the ground truth answer, the semantic similarity score, and the PASS/FAIL status.\n\nExpected Output: \n{\'test_scenario_id\': \'unique_identifier\', \'smart_assistant_response\': \'text\', \'ground_truth_answer\': \'text\', \'semantic_similarity_score\': \'decimal_value\', \'PASS/FAIL\': \'PASS\'/\'FAIL\'}\n\n\n', 'taskResult': ['{\n"task_description": "Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base.",\n"expected_output": "The extracted content of the file.",\n"tool_names": ["FileReadTool"]\n}', '{\n"task_description": "Generate 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots. Generate 3 answer variations for each of the 5 generated questions using the knowledge base.",\n"expected_output": "A JSON object containing 5 questions with 3 variations each and 3 answer variations for each of the 5 questions. The format should be as follows:\\n{\\n  \\"questions\\": [\\n    {\\n      \\"question\\": \\"question_text\\",\\n      \\"variations\\": [\\n        \\"variation_1\\",\\n        \\"variation_2\\",\\n        \\"variation_3\\"\\n      ]\\n    },\\n    ...\\n  ],\\n  \\"answers\\": [\\n    {\\n      \\"question\\": \\"question_text\\",\\n      \\"answer\\": \\"answer_text\\"\\n    },\\n    ...\\n  ]\\n}",\n"tool_names": ["FileReadTool"]\n}', '{\n"task_description": "Simulate a smart assistant and execute the 5 test scenarios generated in step 1. Generate answers for each of the test scenario and assign the generated answers as smart assistant answers. The generated answers should not match the 3 answer variations generated in step 1(b) but it should be factually correct.",\n"expected_output": "5 distinct answers for each test scenario, in plain text format, that are factually correct and do not match the predefined answer variations.",\n"tool_names": ["FileReadTool"]\n}', '{\n"task_description": "After execution of the test scenarios in step 2, do a semantic similarity of the answers generated for each test scenario with the ground truth answers generated in step 1. Based on the semantic similarity score mark the test scenarios as PASS or FAIL assuming the threshold value of 0.7. Output: A JSON object containing the test scenario ID, the smart assistant\'s response, the ground truth answer, the semantic similarity score, and the PASS/FAIL status.",\n"expected_output": "{\'test_scenario_id\': \'unique_identifier\', \'smart_assistant_response\': \'text\', \'ground_truth_answer\': \'text\', \'semantic_similarity_score\': \'decimal_value\', \'PASS/FAIL\': \'PASS\'/\'FAIL\'}",\n"tool_names": ["SummarizerTool", "LinkupSearchTool"]\n}']}
-        finalOutput = []
-        return ucName, businessProfile, businessRules, inputData, directorResp, agentResp, taskResp, finalOutput
+        ucName = 'Automated Smart Test Assistant'
+        businessProfile= 'A software assurance provider which provides services on software testing including web applications, smart assistants, chatbots, etc. The organization specializes in automating test case scenario generation for Generative AI based smart assistants. They use Generative AI large language models to generate test cases ensuring a full coverage of the knowledge base'
+        businessRules = '''
+1. Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base. Use the knowledge base to execute the below steps.
+
+2. Generate test scenarios based on the knowledge base. Test scenarios must cover a wide range of user queries to ensure maximum coverage. Test scenarios should include variations of user queries to account for different user interaction patterns.
+a) Generate only 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots.
+b) Generate 3 answer variations for the each of the 5 generated questions provided in step 1(a) using the knowledge base. Assign the generated answers as ground truth which will be used for execution of the test scenario.
+
+3. Simulate a smart assistant and execute the 5 test scenarios generated in step 1. Generate answers for each of the test scenario and assign the generated answers as smart assistant answers. The generated answers should not match the 3 answer variations generated in step 1(b) but it should be factually correct.
+
+4. After execution of the test scenarios in step 2, do a semantic similarity of the answers generated for each test scenario with the ground truth answers generated in step 1. Based on the semantic similarity score mark the test scenarios as PASS or FAIL assuming the threshold value of 0.7.
+        '''
+        inputData = ''        
+        return ucName, businessProfile, businessRules, inputData
     else :
         ucName = ''
         businessProfile= ''
         businessRules = ''
         inputData = ''
-        directorResp = {'type': 'Master Agent', 'value': 'Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):\n\nWorker Agent: Knowledge Base Extraction Agent\nTask: Extract Knowledge Base\n\nWorker Agent: Test Scenario Generation Agent\nTask: Generate Test Scenarios\n\nWorker Agent: Smart Assistant Simulation Agent\nTask: Simulate Smart Assistant\n\nWorker Agent: Semantic Similarity Agent\nTask: Evaluate Test Scenarios\n\n', 'dirResult': {'worker_agents': [{'name': 'Knowledge Base Extraction Agent', 'task': 'Extract Knowledge Base', 'task_description': 'Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base.', 'task_output': 'The extracted content of the file as the knowledge base.'}, {'name': 'Test Scenario Generation Agent', 'task': 'Generate Test Scenarios', 'task_description': 'Generate 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots. Generate 3 answer variations for each of the 5 generated questions using the knowledge base.', 'task_output': '5 questions with 3 variations each and 3 answer variations for each of the 5 questions.'}, {'name': 'Smart Assistant Simulation Agent', 'task': 'Simulate Smart Assistant', 'task_description': 'Simulate a smart assistant and execute the 5 test scenarios generated in step 1. Generate answers for each of the test scenario and assign the generated answers as smart assistant answers. The generated answers should not match the 3 answer variations generated in step 1(b) but it should be factually correct.', 'task_output': 'Answers generated for each of the 5 test scenarios.'}, {'name': 'Semantic Similarity Agent', 'task': 'Evaluate Test Scenarios', 'task_description': 'After execution of the test scenarios in step 2, do a semantic similarity of the answers generated for each test scenario with the ground truth answers generated in step 1. Based on the semantic similarity score mark the test scenarios as PASS or FAIL assuming the threshold value of 0.7.', 'task_output': 'PASS or FAIL for each of the 5 test scenarios.'}]}}
-        agentResp = {'type': 'Worker Agent', 'value': "The Master Agent initialized the following Actor(s) with their roles and goals:\n\nKNOWLEDGE BASE EXTRACTION AGENT\nRole: Extracts and processes the knowledge base from the provided file.\nGoal: To accurately extract the content of the file and assign it as the knowledge base for further processing.\n\nTEST SCENARIO GENERATION AGENT\nRole: AI Application Specialized in Generating Test Scenarios for Generative AI based Smart Assistants\nGoal: To generate a set of 5 questions with 3 variations each and 3 answer variations for each of the 5 questions based on the provided knowledge base, ensuring maximum coverage of user queries and variations in user interaction patterns.\n\nSMART ASSISTANT SIMULATION AGENT\nRole: Smart Assistant Simulator\nGoal: To simulate a smart assistant and generate answers for 5 test scenarios based on the knowledge base, ensuring the answers are factually correct and not matching the predefined answer variations.\n\nSEMANTIC SIMILARITY AGENT\nRole: Evaluates the semantic similarity of the smart assistant's responses to the ground truth answers and marks the test scenarios as PASS or FAIL\nGoal: To ensure the smart assistant's responses are factually correct and semantically similar to the ground truth answers\n\n", 'agentResult': ['\n{\n"worker_agent": {\n"name": "Knowledge Base Extraction Agent",\n"role": "Extracts and processes the knowledge base from the provided file.",\n"goal": "To accurately extract the content of the file and assign it as the knowledge base for further processing.",\n"backstory": "This agent is designed to handle the initial step of fetching and processing the knowledge base from a given file, ensuring that the subsequent stages of test scenario generation and execution can be carried out effectively."\n}\n}', '\n\n{\n"worker_agent": {\n"name": "Test Scenario Generation Agent",\n"role": "AI Application Specialized in Generating Test Scenarios for Generative AI based Smart Assistants",\n"goal": "To generate a set of 5 questions with 3 variations each and 3 answer variations for each of the 5 questions based on the provided knowledge base, ensuring maximum coverage of user queries and variations in user interaction patterns.",\n"backstory": "This agent is an autonomous AI application designed to specialize in generating test scenarios for Generative AI based smart assistants. It uses Generative AI large language models to generate test cases, ensuring full coverage of the knowledge base. The agent is trained to create colloquial questions imitating user queries in chatbots and generate factually correct answers that do not match the predefined answer variations."\n}\n}', '\n{\n"worker_agent": {\n"name": "Smart Assistant Simulation Agent",\n"role": "Smart Assistant Simulator",\n"goal": "To simulate a smart assistant and generate answers for 5 test scenarios based on the knowledge base, ensuring the answers are factually correct and not matching the predefined answer variations.",\n"backstory": "The Smart Assistant Simulation Agent is an autonomous AI application designed to mimic the behavior of a smart assistant. It is trained to understand and respond to a wide range of user queries related to software testing services, particularly in the domain of Generative AI-based smart assistants. The agent\'s primary goal is to ensure maximum coverage of user queries by generating colloquial test scenarios and providing accurate, non-predefined responses."\n}\n}', '\n{\n"worker_agent": {\n"name": "Semantic Similarity Agent",\n"role": "Evaluates the semantic similarity of the smart assistant\'s responses to the ground truth answers and marks the test scenarios as PASS or FAIL",\n"goal": "To ensure the smart assistant\'s responses are factually correct and semantically similar to the ground truth answers",\n"backstory": "The Semantic Similarity Agent is an autonomous AI application designed to evaluate the performance of smart assistants by comparing their responses to a set of predefined ground truth answers. It uses semantic similarity algorithms to determine if the assistant\'s answers are factually correct and contextually relevant. The agent was developed to ensure the high quality and accuracy of the software testing process for Generative AI-based smart assistants."\n}\n}']}
-        taskResp = {'type': 'actor_task', 'value': 'The Master Agent assigned the following task(s):\n\nEXTRACTS AND PROCESSES THE KNOWLEDGE BASE FROM THE PROVIDED FILE.\nDescription: \nFetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base.\n\nExpected Output: \nThe extracted content of the file.\n\n\nAI APPLICATION SPECIALIZED IN GENERATING TEST SCENARIOS FOR GENERATIVE AI BASED SMART ASSISTANTS\nDescription: \nGenerate 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots. Generate 3 answer variations for each of the 5 generated questions using the knowledge base.\n\nExpected Output: \nA JSON object containing 5 questions with 3 variations each and 3 answer variations for each of the 5 questions. The format should be as follows:\n{\n  "questions": [\n    {\n      "question": "question_text",\n      "variations": [\n        "variation_1",\n        "variation_2",\n        "variation_3"\n      ]\n    },\n    ...\n  ],\n  "answers": [\n    {\n      "question": "question_text",\n      "answer": "answer_text"\n    },\n    ...\n  ]\n}\n\n\nSMART ASSISTANT SIMULATOR\nDescription: \nSimulate a smart assistant and execute the 5 test scenarios generated in step 1. Generate answers for each of the test scenario and assign the generated answers as smart assistant answers. The generated answers should not match the 3 answer variations generated in step 1(b) but it should be factually correct.\n\nExpected Output: \n5 distinct answers for each test scenario, in plain text format, that are factually correct and do not match the predefined answer variations.\n\n\nEVALUATES THE SEMANTIC SIMILARITY OF THE SMART ASSISTANT\'S RESPONSES TO THE GROUND TRUTH ANSWERS AND MARKS THE TEST SCENARIOS AS PASS OR FAIL\nDescription: \nAfter execution of the test scenarios in step 2, do a semantic similarity of the answers generated for each test scenario with the ground truth answers generated in step 1. Based on the semantic similarity score mark the test scenarios as PASS or FAIL assuming the threshold value of 0.7. Output: A JSON object containing the test scenario ID, the smart assistant\'s response, the ground truth answer, the semantic similarity score, and the PASS/FAIL status.\n\nExpected Output: \n{\'test_scenario_id\': \'unique_identifier\', \'smart_assistant_response\': \'text\', \'ground_truth_answer\': \'text\', \'semantic_similarity_score\': \'decimal_value\', \'PASS/FAIL\': \'PASS\'/\'FAIL\'}\n\n\n', 'taskResult': ['{\n"task_description": "Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base.",\n"expected_output": "The extracted content of the file.",\n"tool_names": ["FileReadTool"]\n}', '{\n"task_description": "Generate 5 questions and 3 variations of each of the 5 generated questions based on the knowledge base. The questions should be colloquial in nature imitating how users type question in chatbots. Generate 3 answer variations for each of the 5 generated questions using the knowledge base.",\n"expected_output": "A JSON object containing 5 questions with 3 variations each and 3 answer variations for each of the 5 questions. The format should be as follows:\\n{\\n  \\"questions\\": [\\n    {\\n      \\"question\\": \\"question_text\\",\\n      \\"variations\\": [\\n        \\"variation_1\\",\\n        \\"variation_2\\",\\n        \\"variation_3\\"\\n      ]\\n    },\\n    ...\\n  ],\\n  \\"answers\\": [\\n    {\\n      \\"question\\": \\"question_text\\",\\n      \\"answer\\": \\"answer_text\\"\\n    },\\n    ...\\n  ]\\n}",\n"tool_names": ["FileReadTool"]\n}', '{\n"task_description": "Simulate a smart assistant and execute the 5 test scenarios generated in step 1. Generate answers for each of the test scenario and assign the generated answers as smart assistant answers. The generated answers should not match the 3 answer variations generated in step 1(b) but it should be factually correct.",\n"expected_output": "5 distinct answers for each test scenario, in plain text format, that are factually correct and do not match the predefined answer variations.",\n"tool_names": ["FileReadTool"]\n}', '{\n"task_description": "After execution of the test scenarios in step 2, do a semantic similarity of the answers generated for each test scenario with the ground truth answers generated in step 1. Based on the semantic similarity score mark the test scenarios as PASS or FAIL assuming the threshold value of 0.7. Output: A JSON object containing the test scenario ID, the smart assistant\'s response, the ground truth answer, the semantic similarity score, and the PASS/FAIL status.",\n"expected_output": "{\'test_scenario_id\': \'unique_identifier\', \'smart_assistant_response\': \'text\', \'ground_truth_answer\': \'text\', \'semantic_similarity_score\': \'decimal_value\', \'PASS/FAIL\': \'PASS\'/\'FAIL\'}",\n"tool_names": ["SummarizerTool", "LinkupSearchTool"]\n}']}
-        finalOutput = []
-        return ucName, businessProfile, businessRules, inputData, directorResp, agentResp, taskResp, finalOutput
+        return ucName, businessProfile, businessRules, inputData
 
-@st.dialog("Please Select")
+@st.dialog("Select")
 def automultiagentselect():
+    st.write("Please select to load an existing example or go for a new run.")
     example1Col, example2Col, newRunCol = st.columns(3)
     with example1Col:
-        if st.button("Example1", type="primary"):
+        if st.button("Automated Smart Test Assistant", type="primary"):
             st.session_state.automultiagentselect = {"selected": "Example1"}
             st.rerun()
     with example2Col:
@@ -508,44 +504,8 @@ else :
             businessRules = st.text_area("Business Rules", placeholder="Enter the detailed business rules")
         with inputDataCol:
             inputData = st.text_area("Input Data", placeholder="Enter the input data")
-
-        if(st.button('Initiate', type="secondary")):
-            directorResp = director_prompt_output(businessProfile, businessRules)
-            agentResp = agents_prompt_output(businessProfile, businessRules, directorResp['dirResult'])
-            taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])          
-            finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)         
-
-            st.divider()
-            st.header("Execution", divider="gray")
-
-            dirRespCol, agentRespCol, taskRespCol = st.columns(3)
-            with dirRespCol:
-                with st.container():
-                    st.subheader("**Master Agent**")
-                with st.container(height=250, border=True):
-                    st.markdown(directorResp['value'])
-            with agentRespCol:
-                with st.container():
-                    st.subheader("**Worker Agent**")
-                with st.container(height=250, border=True):
-                    st.markdown(agentResp['value'])
-            with taskRespCol:
-                with st.container():
-                    st.subheader("**Task Details**")
-                with st.container(height=250, border=True):
-                    st.markdown(taskResp['value']) 
-
-            st.header("Final Output", divider="gray")           
-
-            for currAgentOp in finalOutput:
-                with st.expander('Agent: ' + currAgentOp['agent']):
-                    if currAgentOp['output'].startswith('json'):
-                        viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
-                        st.json(json.loads(viewJson))
-                    else :
-                        st.markdown(currAgentOp['output'])
     else :
-        ucName, ebusinessProfile, ebusinessRules, einputData, directorResp, agentResp, taskResp, finalOutput = getExampleSet(selectedOption)
+        ucName, ebusinessProfile, ebusinessRules, einputData = getExampleSet(selectedOption)
         
         usecaseName = st.text_input("Usecase Name",value = ucName, placeholder="Enter the name of the use case")
         businessProfile = st.text_area("Business Profile",value = ebusinessProfile, placeholder="Enter the detailed business profile", height =68)
@@ -555,24 +515,30 @@ else :
             businessRules = st.text_area("Business Rules",value = ebusinessRules, placeholder="Enter the detailed business rules")
         with inputDataCol:
             inputData = st.text_area("Input Data",value = einputData, placeholder="Enter the input data")
-        
+
+    if(st.button('Initiate', type="secondary")):
+        masterAgentResp = master_agent_prompt_output(businessProfile, businessRules)
+        agentResp = worker_agents_prompt_output(businessProfile, businessRules, masterAgentResp['maResult'])
+        taskResp = task_prompt_output(businessProfile, masterAgentResp['maResult'], agentResp['agentResult'])          
+        finalOutput = multi_agent_crew(5, masterAgentResp['maResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)         
+
         st.divider()
         st.header("Execution", divider="gray")
 
         dirRespCol, agentRespCol, taskRespCol = st.columns(3)
         with dirRespCol:
             with st.container():
-                st.subheader("**Master Agent**")
+                st.subheader("Master Agent")
             with st.container(height=250, border=True):
-                st.markdown(directorResp['value'])
+                st.markdown(masterAgentResp['value'])
         with agentRespCol:
             with st.container():
-                st.subheader("**Worker Agent**")
+                st.subheader("Worker Agent")
             with st.container(height=250, border=True):
                 st.markdown(agentResp['value'])
         with taskRespCol:
             with st.container():
-                st.subheader("**Task Details**")
+                st.subheader("Task Details")
             with st.container(height=250, border=True):
                 st.markdown(taskResp['value']) 
 
