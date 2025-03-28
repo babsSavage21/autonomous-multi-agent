@@ -248,6 +248,7 @@ def director_prompt_output(companyProfile, BusinessRule):
     dir_prompt_input1 = "##Company Profile##\n" +  companyProfile + "\n\n##Business Rule##\n" + BusinessRule       
     prompt_input = f"""You are an autonomous AI application. Based on the company profile and business rules identify the worker agents, task, task description including the business conditions and expected output. The output should be in below JSON format with the worker agents, task description and expected output for each agent.
 
+```json
 {{
 "worker_agents": [
     {{
@@ -270,6 +271,7 @@ def director_prompt_output(companyProfile, BusinessRule):
     }}
 ]
 }}
+```
 
 Input: {dir_prompt_input1}
 Output:"""
@@ -279,7 +281,7 @@ Output:"""
     dir_result = (dir_generated_response+" ")[:dir_generated_response.find("Input:")]
     final_dir_config = ''
     print(dir_result)
-    dir_result_json = json.loads(dir_result)
+    dir_result_json = json.loads(extract_json_string(dir_result))
 
     for val in dir_result_json['worker_agents']:
         actors_name = val['name']
