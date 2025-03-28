@@ -293,8 +293,8 @@ Output:"""
     # final_dir_config = final_dir_config.replace("AGENT", "ACTOR")
     
     dir_resp_json = {
-            "type":"director",
-            "value":"Based on the business requirement, Director has identified the below Actor(s) and Task(s):" + "\n\n" + final_dir_config,
+            "type":"Master Agent",
+            "value":"Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):" + "\n\n" + final_dir_config,
             "dirResult": dir_result
             }
     final_dir_resp_json=jsonify(dir_resp_json)
@@ -333,7 +333,7 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
 
     agent_resp_json = {
             "type":"Worker Agent",
-            "value":"The Director initialized the following Actor(s) with their roles and goals:" + "\n\n" + final_agent_config,
+            "value":"The Master Agent initialized the following Actor(s) with their roles and goals:" + "\n\n" + final_agent_config,
             "agentResult": final_agent_result
             }
     final_agent_resp_json=jsonify(agent_resp_json)
@@ -377,7 +377,7 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
         
     task_resp_json = {
             "type":"actor_task",
-            "value":"The Director assigned the following task(s):" + "\n\n" + final_task_config,
+            "value":"The Master Agent assigned the following task(s):" + "\n\n" + final_task_config,
             "taskResult": final_task_result
 
             }
@@ -481,16 +481,16 @@ with inputDataCol:
 
 if(st.button('Initiate')):
     directorResp = director_prompt_output(businessProfile, businessRules)
-    agentResp = agents_prompt_output(businessProfile, businessRules, directorResp)
-    taskResp = task_prompt_output(businessProfile, directorResp, agentResp)
-    finalOutput = multi_agent_crew(5, directorResp, agentResp, taskResp, inputData)
+    agentResp = agents_prompt_output(businessProfile, businessRules, directorResp['dirResult'])
+    taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])
+    finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)
 
     dirRespCol, agentRespCol, taskRespCol = st.columns(3)
     with dirRespCol:
-        st.markdown(str(directorResp))
+        st.markdown(directorResp['value'])
     with agentRespCol:
-        st.markdown(str(agentResp))
+        st.markdown(agentResp['value'])
     with taskRespCol:
-        st.markdown(str(taskResp)) 
+        st.markdown(taskResp['value']) 
 
     st.markdown(str(finalOutput))
