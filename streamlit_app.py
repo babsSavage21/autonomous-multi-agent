@@ -280,7 +280,6 @@ Output:"""
     dir_generated_response = model.generate_text(prompt=prompt_input)
     dir_result = (dir_generated_response+" ")[:dir_generated_response.find("Input:")]
     final_dir_config = ''
-    print(dir_result)
     dir_result_json = json.loads(extract_json_string(dir_result))
 
     for val in dir_result_json['worker_agents']:
@@ -315,7 +314,6 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
         model = get_llm_models(model_id, parameters, project_id)
         agent_generated_response = model.generate_text(prompt=agent_prompt_input)
         agent_result = (agent_generated_response+" ")[:agent_generated_response.find("Input:")]
-        print(agent_result)
         agent_result_json = json.loads(agent_result)
 
         agent_name = agent_result_json['worker_agent']['name']
@@ -361,7 +359,6 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
         task_generated_response = model.generate_text(prompt=task_prompt_input)
         task_generated_response = extract_json_string(task_generated_response)
         task_result = (task_generated_response+" ")[:task_generated_response.find("Input:")]
-        print(task_result)
         task_result_json = json.loads(task_result)
 
         task_desc = task_result_json['task_description']
@@ -453,10 +450,9 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
             }
             final_response.append(answer_dict)
             
-        crew_final_response = answer_dict
+        crew_final_response = final_response
 
     except Exception as exp:
-        print(exp)
         model_execution_errors=[{"errorDetails":str(exp)}]
         modelResult=[]
         final_response_json={"modelResult":modelResult,"modelExecutionErrors":model_execution_errors}
@@ -476,20 +472,25 @@ with inputDataCol:
 
 if(st.button('Initiate')):
     directorResp = director_prompt_output(businessProfile, businessRules)
-    print(directorResp)
     agentResp = agents_prompt_output(businessProfile, businessRules, directorResp['dirResult'])
-    print(agentResp)
     taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])
-    print(taskResp)
     finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)
-    print(finalOutput)
 
     dirRespCol, agentRespCol, taskRespCol = st.columns(3)
     with dirRespCol:
-        st.markdown(directorResp['value'])
+        with st.container(height=250, border=True):
+            st.markdown(directorResp['value'])
     with agentRespCol:
-        st.markdown(agentResp['value'])
+         with st.container(height=250, border=True):
+            st.markdown(agentResp['value'])
     with taskRespCol:
-        st.markdown(taskResp['value']) 
+         with st.container(height=250, border=True):
+            st.markdown(taskResp['value']) 
 
-    st.markdown(str(finalOutput))
+    for currAgentOp in finalOutput:
+       with st.expander(currAgentOp['agent']):
+        if currAgentOp['output'].startswith('json'):
+            viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
+            st.json(json.loads(viewJson))
+        else :
+            st.markdown(currAgentOp['output'])
