@@ -401,9 +401,9 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
         for json_str in agent_result:
             agent_info = json.loads(json_str)
             currentAgents.append(Agent(
-            role=agent_info['actor']['role'],
-            goal=agent_info['actor']['goal'],
-            backstory=agent_info['actor']['backstory'],
+            role=agent_info['worker_agent']['role'],
+            goal=agent_info['worker_agent']['goal'],
+            backstory=agent_info['worker_agent']['backstory'],
             tools=[],
             llm=llm,
             max_iter=max_iter,
@@ -456,6 +456,7 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
         crew_final_response = answer_dict
 
     except Exception as exp:
+        print(exp)
         model_execution_errors=[{"errorDetails":str(exp)}]
         modelResult=[]
         final_response_json={"modelResult":modelResult,"modelExecutionErrors":model_execution_errors}
