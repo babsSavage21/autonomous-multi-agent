@@ -265,6 +265,7 @@ def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
         model = get_llm_models(model_id, parameters, project_id)
         agent_generated_response = model.generate_text(prompt=agent_prompt_input)
         agent_result = (agent_generated_response+" ")[:agent_generated_response.find("Input:")]
+        print(agent_result)
         agent_result_json = json.loads(agent_result)
 
         agent_name = agent_result_json['worker_agent']['name']
