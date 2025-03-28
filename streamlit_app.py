@@ -359,15 +359,15 @@ def multi_agent_crew(max_iter, maResult, agentResult, taskResult, userQuery):
             task_tool = task_info['tool_names']
             
             for tool_name in task_tool:
-                print(tool_name)
-                print(type(tool_name))
                 if tool_name=='FileReadTool':
                     file_read_tool = FileReadTool(file_path=userQuery)
                     file_data = file_read_tool.run()
 
                 elif tool_name=='FetchProductRivewTool':
                     file_data = main(userQuery)
-            
+                
+                else:
+                    file_data = userQuery            
 
             description = dedent(f"""
                 {task_info['task_description']}
