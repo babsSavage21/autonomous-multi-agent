@@ -388,10 +388,7 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
             api_key= "szAY0l-S9imIeyTUyn3zq5VlTlglzIqKLDJGnefWr6SZ",
             project_id = project_id
         )
-
-        dir_result = dirResult #director_prompt_output(companyProfile, BusinessRule)
-        #dir_result = json.loads(dir_result)
-        
+      
         agent_result = agentResult#agents_prompt_output(companyProfile, dir_result, llm)
         currentAgents = []
 
@@ -460,48 +457,131 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
 
     return crew_final_response
 
+def getExampleSet(setName):
+    if setName == 'Example1':
+        ucName = ''
+        businessProfile= ''
+        businessRules = ''
+        inputData = ''
+        directorResp = ''
+        agentResp = ''
+        taskResp = ''
+        finalOutput = ''
+        return businessProfile, businessRules, inputData, directorResp, agentResp, taskResp, finalOutput
+    else :
+        ucName = ''
+        businessProfile= ''
+        businessRules = ''
+        inputData = ''
+        directorResp = ''
+        agentResp = ''
+        taskResp = ''
+        finalOutput = ''
+        return ucName, businessProfile, businessRules, inputData, directorResp, agentResp, taskResp, finalOutput
 
-usecaseName = st.text_input("Usecase Name", placeholder="Enter the name of the use case")
-businessProfile = st.text_area("Business Profile", placeholder="Enter the detailed business profile", height =68)
+@st.dialog("Please Select")
+def automultiagentselect():
+    example1Col, example2Col, newRunCol = st.columns(3)
+    with example1Col:
+        if st.button("Example1", type="primary"):
+            st.session_state.automultiagentselect = {"selected": "Example1"}
+            st.rerun()
+    with example2Col:
+        if st.button("Example2", type="primary"):
+            st.session_state.automultiagentselect = {"selected": "Example2"}
+            st.rerun()
+    with newRunCol:
+        if st.button("New Run", type="primary"):
+            st.session_state.automultiagentselect = {"selected": "New Run"}
+            st.rerun()
 
-bisRulesCol, inputDataCol = st.columns(2)
-with bisRulesCol:
-    businessRules = st.text_area("Business Rules", placeholder="Enter the detailed business rules")
-with inputDataCol:
-    inputData = st.text_area("Input Data", placeholder="Enter the input data")
+if "automultiagentselect" not in st.session_state:
+    automultiagentselect()
+else :
+    selectedOption = st.session_state.automultiagentselect['selected']
+    if selectedOption == 'New Run':
+        usecaseName = st.text_input("Usecase Name", placeholder="Enter the name of the use case")
+        businessProfile = st.text_area("Business Profile", placeholder="Enter the detailed business profile", height =68)
 
-if(st.button('Initiate')):
-    directorResp = director_prompt_output(businessProfile, businessRules)
-    agentResp = agents_prompt_output(businessProfile, businessRules, directorResp['dirResult'])
-    taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])
-    finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)
+        bisRulesCol, inputDataCol = st.columns(2)
+        with bisRulesCol:
+            businessRules = st.text_area("Business Rules", placeholder="Enter the detailed business rules")
+        with inputDataCol:
+            inputData = st.text_area("Input Data", placeholder="Enter the input data")
 
-    st.divider()
-    st.header("Execution", divider="gray")
+        if(st.button('Initiate', type="secondary")):
+            directorResp = director_prompt_output(businessProfile, businessRules)
+            agentResp = agents_prompt_output(businessProfile, businessRules, directorResp['dirResult'])
+            taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])
+            finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)
 
-    dirRespCol, agentRespCol, taskRespCol = st.columns(3)
-    with dirRespCol:
-        with st.container():
-            st.subheader("**Master Agent**")
-        with st.container(height=250, border=True):
-            st.markdown(directorResp['value'])
-    with agentRespCol:
-        with st.container():
-            st.subheader("**Worker Agent Details**")
-        with st.container(height=250, border=True):
-            st.markdown(agentResp['value'])
-    with taskRespCol:
-        with st.container():
-            st.subheader("**Task Details**")
-        with st.container(height=250, border=True):
-            st.markdown(taskResp['value']) 
+            st.divider()
+            st.header("Execution", divider="gray")
 
-    st.header("Final Output", divider="gray")           
+            dirRespCol, agentRespCol, taskRespCol = st.columns(3)
+            with dirRespCol:
+                with st.container():
+                    st.subheader("**Master Agent**")
+                with st.container(height=250, border=True):
+                    st.markdown(directorResp['value'])
+            with agentRespCol:
+                with st.container():
+                    st.subheader("**Worker Agent**")
+                with st.container(height=250, border=True):
+                    st.markdown(agentResp['value'])
+            with taskRespCol:
+                with st.container():
+                    st.subheader("**Task Details**")
+                with st.container(height=250, border=True):
+                    st.markdown(taskResp['value']) 
 
-    for currAgentOp in finalOutput:
-       with st.expander('Agent: ' + currAgentOp['agent']):
-        if currAgentOp['output'].startswith('json'):
-            viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
-            st.json(json.loads(viewJson))
-        else :
-            st.markdown(currAgentOp['output'])
+            st.header("Final Output", divider="gray")           
+
+            for currAgentOp in finalOutput:
+                with st.expander('Agent: ' + currAgentOp['agent']):
+                    if currAgentOp['output'].startswith('json'):
+                        viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
+                        st.json(json.loads(viewJson))
+                    else :
+                        st.markdown(currAgentOp['output'])
+    else :
+        ucName, ebusinessProfile, ebusinessRules, einputData, directorResp, agentResp, taskResp, finalOutput = getExampleSet(selectedOption)
+        
+        usecaseName = st.text_input("Usecase Name",value = ucName, placeholder="Enter the name of the use case")
+        businessProfile = st.text_area("Business Profile",value = ebusinessProfile, placeholder="Enter the detailed business profile", height =68)
+
+        bisRulesCol, inputDataCol = st.columns(2)
+        with bisRulesCol:
+            businessRules = st.text_area("Business Rules",value = ebusinessRules, placeholder="Enter the detailed business rules")
+        with inputDataCol:
+            inputData = st.text_area("Input Data",value = einputData, placeholder="Enter the input data")
+        
+        st.divider()
+        st.header("Execution", divider="gray")
+
+        dirRespCol, agentRespCol, taskRespCol = st.columns(3)
+        with dirRespCol:
+            with st.container():
+                st.subheader("**Master Agent**")
+            with st.container(height=250, border=True):
+                st.markdown(directorResp['value'])
+        with agentRespCol:
+            with st.container():
+                st.subheader("**Worker Agent**")
+            with st.container(height=250, border=True):
+                st.markdown(agentResp['value'])
+        with taskRespCol:
+            with st.container():
+                st.subheader("**Task Details**")
+            with st.container(height=250, border=True):
+                st.markdown(taskResp['value']) 
+
+        st.header("Final Output", divider="gray")           
+
+        for currAgentOp in finalOutput:
+            with st.expander('Agent: ' + currAgentOp['agent']):
+                if currAgentOp['output'].startswith('json'):
+                    viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
+                    st.json(json.loads(viewJson))
+                else :
+                    st.markdown(currAgentOp['output'])
