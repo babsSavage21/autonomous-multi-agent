@@ -467,7 +467,7 @@ def getExampleSet(setName):
         agentResp = ''
         taskResp = ''
         finalOutput = ''
-        return businessProfile, businessRules, inputData, directorResp, agentResp, taskResp, finalOutput
+        return ucName, businessProfile, businessRules, inputData, directorResp, agentResp, taskResp, finalOutput
     else :
         ucName = ''
         businessProfile= ''
@@ -511,9 +511,17 @@ else :
 
         if(st.button('Initiate', type="secondary")):
             directorResp = director_prompt_output(businessProfile, businessRules)
+            print(directorResp)
+            print('End of Director')
             agentResp = agents_prompt_output(businessProfile, businessRules, directorResp['dirResult'])
+            print(agentResp)
+            print('End of agent')
             taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])
+            print(taskResp)
+            print('End of task')            
             finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)
+            print(finalOutput)
+            print('End of Final')              
 
             st.divider()
             st.header("Execution", divider="gray")
