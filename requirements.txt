@@ -2,7 +2,7 @@ streamlit
 streamlit-card
 Flask >=1.0.0
 flask_cors==3.0.3
-numpy==1.23.5
+numpy==1.26.2
 crewai==0.108.0
 crewai-tools==0.38.1
 langchain-community==0.3.20
