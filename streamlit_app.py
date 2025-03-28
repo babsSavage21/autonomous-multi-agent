@@ -278,6 +278,7 @@ Output:"""
     dir_generated_response = model.generate_text(prompt=prompt_input)
     dir_result = (dir_generated_response+" ")[:dir_generated_response.find("Input:")]
     final_dir_config = ''
+    print(dir_result)
     dir_result_json = json.loads(dir_result)
 
     for val in dir_result_json['worker_agents']:
@@ -297,7 +298,7 @@ Output:"""
 
 def agents_prompt_output(companyProfile, BusinessRule, dir_result):
     
-    dir_result = json.loads(dir_result)
+    #dir_result = json.loads(dir_result)
     final_agent_result = []
     final_agent_config = ''
 
@@ -312,6 +313,7 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
         model = get_llm_models(model_id, parameters, project_id)
         agent_generated_response = model.generate_text(prompt=agent_prompt_input)
         agent_result = (agent_generated_response+" ")[:agent_generated_response.find("Input:")]
+        print(agent_result)
         agent_result_json = json.loads(agent_result)
 
         agent_name = agent_result_json['worker_agent']['name']
@@ -334,7 +336,7 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
 def task_prompt_output(companyProfile, dir_result, agent_result):
     
     final_task_result = []
-    dir_result = json.loads(dir_result)
+    #dir_result = json.loads(dir_result)
     dir_data = dir_result['worker_agents']
     final_task_config = ''
 
@@ -357,7 +359,7 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
         task_generated_response = model.generate_text(prompt=task_prompt_input)
         task_generated_response = extract_json_string(task_generated_response)
         task_result = (task_generated_response+" ")[:task_generated_response.find("Input:")]
-
+        print(task_result)
         task_result_json = json.loads(task_result)
 
         task_desc = task_result_json['task_description']
@@ -389,7 +391,7 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
         )
 
         dir_result = dirResult #director_prompt_output(companyProfile, BusinessRule)
-        dir_result = json.loads(dir_result)
+        #dir_result = json.loads(dir_result)
         
         agent_result = agentResult#agents_prompt_output(companyProfile, dir_result, llm)
         currentAgents = []
