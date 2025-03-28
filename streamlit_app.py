@@ -462,7 +462,7 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
 
 
 usecaseName = st.text_input("Usecase Name", placeholder="Enter the name of the use case")
-businessProfile = st.text_area("Business Profile", placeholder="Enter the detailed business profile")
+businessProfile = st.text_area("Business Profile", placeholder="Enter the detailed business profile", height =68)
 
 bisRulesCol, inputDataCol = st.columns(2)
 with bisRulesCol:
@@ -476,19 +476,30 @@ if(st.button('Initiate')):
     taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])
     finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)
 
+    st.divider()
+    st.header("Execution", divider="gray")
+
     dirRespCol, agentRespCol, taskRespCol = st.columns(3)
     with dirRespCol:
+        with st.container():
+            st.subheader("**Master Agent**")
         with st.container(height=250, border=True):
             st.markdown(directorResp['value'])
     with agentRespCol:
-         with st.container(height=250, border=True):
+        with st.container():
+            st.subheader("**Worker Agent Details**")
+        with st.container(height=250, border=True):
             st.markdown(agentResp['value'])
     with taskRespCol:
-         with st.container(height=250, border=True):
+        with st.container():
+            st.subheader("**Task Details**")
+        with st.container(height=250, border=True):
             st.markdown(taskResp['value']) 
 
+    st.header("Final Output", divider="gray")           
+
     for currAgentOp in finalOutput:
-       with st.expander(currAgentOp['agent']):
+       with st.expander('Agent: ' + currAgentOp['agent']):
         if currAgentOp['output'].startswith('json'):
             viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
             st.json(json.loads(viewJson))
