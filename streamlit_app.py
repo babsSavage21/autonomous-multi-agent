@@ -292,7 +292,7 @@ Output:"""
     dir_resp_json = {
             "type":"Master Agent",
             "value":"Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):" + "\n\n" + final_dir_config,
-            "dirResult": dir_result
+            "dirResult": dir_result_json
             }
     final_dir_resp_json=dir_resp_json
 
@@ -475,9 +475,13 @@ with inputDataCol:
 
 if(st.button('Initiate')):
     directorResp = director_prompt_output(businessProfile, businessRules)
+    print(directorResp)
     agentResp = agents_prompt_output(businessProfile, businessRules, directorResp['dirResult'])
+    print(agentResp)
     taskResp = task_prompt_output(businessProfile, directorResp['dirResult'], agentResp['agentResult'])
+    print(taskResp)
     finalOutput = multi_agent_crew(5, directorResp['dirResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)
+    print(finalOutput)
 
     dirRespCol, agentRespCol, taskRespCol = st.columns(3)
     with dirRespCol:
