@@ -297,7 +297,7 @@ Output:"""
             "value":"Based on the business requirement, Master Agent has identified the below Worker Agent(s) and Task(s):" + "\n\n" + final_dir_config,
             "dirResult": dir_result
             }
-    final_dir_resp_json=jsonify(dir_resp_json)
+    final_dir_resp_json=dir_resp_json
 
     return final_dir_resp_json
 
@@ -336,7 +336,7 @@ def agents_prompt_output(companyProfile, BusinessRule, dir_result):
             "value":"The Master Agent initialized the following Actor(s) with their roles and goals:" + "\n\n" + final_agent_config,
             "agentResult": final_agent_result
             }
-    final_agent_resp_json=jsonify(agent_resp_json)
+    final_agent_resp_json=agent_resp_json
 
     return final_agent_resp_json
 
@@ -381,7 +381,7 @@ def task_prompt_output(companyProfile, dir_result, agent_result):
             "taskResult": final_task_result
 
             }
-    final_task_resp_json=jsonify(task_resp_json)
+    final_task_resp_json=task_resp_json
 
     return final_task_resp_json
 
@@ -458,14 +458,13 @@ def multi_agent_crew(max_iter, dirResult, agentResult, taskResult, userQuery):
             }
             final_response.append(answer_dict)
             
-        crew_final_response = jsonify(answer_dict)
+        crew_final_response = answer_dict
 
     except Exception as exp:
         model_execution_errors=[{"errorDetails":str(exp)}]
         modelResult=[]
         final_response_json={"modelResult":modelResult,"modelExecutionErrors":model_execution_errors}
-        response=jsonify(final_response_json) 
-        return response      
+        return final_response_json      
 
     return crew_final_response
 
