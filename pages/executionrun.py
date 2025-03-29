@@ -28,6 +28,20 @@ parameters = {
     "repetition_penalty": 1
 }
 
+st.html("""
+    <style>
+        .stMainBlockContainer {
+            max-width:70rem;
+        }
+    </style>
+    """
+)
+
+st.set_page_config(
+    page_title = 'Execution Run'
+)
+st.title('Autonomous Multi Agent Framwork')
+
 def get_credentials():
     return {
         "url" : "https://us-south.ml.cloud.ibm.com",
@@ -465,19 +479,23 @@ X (Twitter) Text
 
 @st.dialog("Select")
 def automultiagentselect():
-    st.write("Please select to load an existing example or go for a new run.")
-    example1Col, example2Col, newRunCol = st.columns(3)
-    with example1Col:
-        if st.button("Automated Smart Test Assistant", type="primary"):
-            st.session_state.automultiagentselect = {"selected": "Example1"}
-            st.rerun()
-    with example2Col:
-        if st.button("Product Review System", type="primary"):
-            st.session_state.automultiagentselect = {"selected": "Example2"}
-            st.rerun()
-    with newRunCol:
-        if st.button("New Run", type="primary"):
+    selection_options = {
+    1: "Automated Smart Test Assistant",
+    2: "Product Review System",
+    3: "New Run",
+    }
+    userSelection = st.pills(
+        "Please select to load an existing example or go for a new run",
+        options=selection_options.keys(),
+        format_func=lambda option: selection_options[option],
+        selection_mode="single",
+    )
+    if userSelection is not None:
+        if userSelection == 3:
             st.session_state.automultiagentselect = {"selected": "New Run"}
+            st.rerun()
+        else :
+            st.session_state.automultiagentselect = {"selected": "Example" + userSelection}
             st.rerun()
 
 if "automultiagentselect" not in st.session_state:
