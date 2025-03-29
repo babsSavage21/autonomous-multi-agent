@@ -494,7 +494,7 @@ def automultiagentselect():
             st.session_state.automultiagentselect = {"selected": "New Run"}
             st.rerun()
         else :
-            st.session_state.automultiagentselect = {"selected": "Example" + userSelection}
+            st.session_state.automultiagentselect = {"selected": "Example" + str(userSelection)}
             st.rerun()
 
 if "automultiagentselect" not in st.session_state:
