@@ -1,5 +1,8 @@
 import streamlit as st
 
+st.set_page_config(
+    page_title = 'Homepage'
+)
 st.html("""
     <style>
         .stMainBlockContainer {
@@ -9,7 +12,5 @@ st.html("""
     """
 )
 
-st.set_page_config(
-    page_title = 'Homepage'
-)
+
 st.title('Autonomous Multi Agent Framwork')

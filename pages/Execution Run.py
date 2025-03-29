@@ -28,6 +28,9 @@ parameters = {
     "repetition_penalty": 1
 }
 
+st.set_page_config(
+    page_title = 'Execution Run'
+)
 st.html("""
     <style>
         .stMainBlockContainer {
@@ -35,10 +38,6 @@ st.html("""
         }
     </style>
     """
-)
-
-st.set_page_config(
-    page_title = 'Execution Run'
 )
 st.title('Autonomous Multi Agent Framwork')
 
