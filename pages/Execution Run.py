@@ -518,9 +518,9 @@ else :
 
         bisRulesCol, inputDataCol = st.columns(2)
         with bisRulesCol:
-            businessRules = st.text_area("Business Rules",value = ebusinessRules, placeholder="Enter the detailed business rules")
+            businessRules = st.text_area("Business Rules",value = ebusinessRules, placeholder="Enter the detailed business rules", height =160)
         with inputDataCol:
-            inputData = st.text_area("Input Data",value = einputData, placeholder="Enter the input data")
+            inputData = st.text_area("Input Data",value = einputData, placeholder="Enter the input data", height =160)
 
     if(st.button('Initiate', type="secondary")):
         masterAgentResp = master_agent_prompt_output(businessProfile, businessRules)
