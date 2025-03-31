@@ -1,13 +1,12 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title = 'Homepage'
+    page_title = 'Homepage',
+    layout="wide"
 )
 st.html("""
     <style>
-        .stMainBlockContainer {
-            max-width:90rem;
-        }
+       
 
         ol {
             padding-left: 40px;
