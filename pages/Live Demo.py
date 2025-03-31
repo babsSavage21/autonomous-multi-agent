@@ -430,7 +430,7 @@ def multi_agent_crew(max_iter, maResult, agentResult, taskResult, userQuery):
     return crew_final_response
 
 def getExampleSet(setName):
-    if setName == 'Example1':
+    if setName == 'Smart Assistant Test Automation':
         ucName = 'Smart Assistant Test Automation'
         businessProfile= 'A software assurance provider which provides services on software testing including web applications, smart assistants, chatbots, etc. The organization specializes in automating test case scenario generation for Generative AI based smart assistants. They use Generative AI large language models to generate test cases ensuring a full coverage of the knowledge base'
         businessRules = '''1. Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base. Use the knowledge base to execute the below steps.
@@ -477,88 +477,63 @@ X (Twitter) Text
         inputData = 'https://www.amazon.in/dp/B07MXXW3RL'
         return ucName, businessProfile, businessRules, inputData
 
-@st.dialog("Select")
-def automultiagentselect():
-    selection_options = {
-    1: "Smart Assistant Test Automation",
-    2: "Product Review System",
-    3: "New Run",
-    }
-    userSelection = st.pills(
-        "Please select to load an existing example or go for a new run",
-        options=selection_options.keys(),
-        format_func=lambda option: selection_options[option],
-        selection_mode="single",
-    )
-    print(userSelection)
-    if userSelection is not None:
-        if userSelection == 3:
-            st.session_state.automultiagentselect = {"selected": "New Run"}
-            st.rerun()
-        else :
-            st.session_state.automultiagentselect = {"selected": "Example" + str(userSelection)}
-            st.rerun()
+selectedOption = st.selectbox(
+    "Please select to load an existing example or go for a new run",
+    ("Smart Assistant Test Automation", "Product Review System", "New Run"),
+)
 
-if "automultiagentselect" not in st.session_state:
-    automultiagentselect()
+if selectedOption == 'New Run':
+    usecaseName = st.text_input("Usecase Name", placeholder="Enter the name of the use case")
+    businessProfile = st.text_area("Business Profile", placeholder="Enter the detailed business profile", height =68)
+
+    bisRulesCol, inputDataCol = st.columns(2)
+    with bisRulesCol:
+        businessRules = st.text_area("Business Rules", placeholder="Enter the detailed business rules")
+    with inputDataCol:
+        inputData = st.text_area("Input Data", placeholder="Enter the input data")
 else :
-    if(st.button('Select Example', type="primary")):
-            automultiagentselect()
+    ucName, ebusinessProfile, ebusinessRules, einputData = getExampleSet(selectedOption)
+    
+    usecaseName = st.text_input("Usecase Name",value = ucName, placeholder="Enter the name of the use case")
+    businessProfile = st.text_area("Business Profile",value = ebusinessProfile, placeholder="Enter the detailed business profile", height =68)
 
-    selectedOption = st.session_state.automultiagentselect['selected']
-    del st.session_state['automultiagentselect']
-    if selectedOption == 'New Run':
-        usecaseName = st.text_input("Usecase Name", placeholder="Enter the name of the use case")
-        businessProfile = st.text_area("Business Profile", placeholder="Enter the detailed business profile", height =68)
+    bisRulesCol, inputDataCol = st.columns(2)
+    with bisRulesCol:
+        businessRules = st.text_area("Business Rules",value = ebusinessRules, placeholder="Enter the detailed business rules", height =160)
+    with inputDataCol:
+        inputData = st.text_area("Input Data",value = einputData, placeholder="Enter the input data", height =160)
 
-        bisRulesCol, inputDataCol = st.columns(2)
-        with bisRulesCol:
-            businessRules = st.text_area("Business Rules", placeholder="Enter the detailed business rules")
-        with inputDataCol:
-            inputData = st.text_area("Input Data", placeholder="Enter the input data")
-    else :
-        ucName, ebusinessProfile, ebusinessRules, einputData = getExampleSet(selectedOption)
-        
-        usecaseName = st.text_input("Usecase Name",value = ucName, placeholder="Enter the name of the use case")
-        businessProfile = st.text_area("Business Profile",value = ebusinessProfile, placeholder="Enter the detailed business profile", height =68)
+if(st.button('Initiate', type="secondary")):
+    masterAgentResp = master_agent_prompt_output(businessProfile, businessRules)
+    agentResp = worker_agents_prompt_output(businessProfile, businessRules, masterAgentResp['maResult'])
+    taskResp = task_prompt_output(businessProfile, masterAgentResp['maResult'], agentResp['agentResult'])          
+    finalOutput = multi_agent_crew(5, masterAgentResp['maResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)         
+    st.divider()
+    st.header("Execution", divider="gray")
 
-        bisRulesCol, inputDataCol = st.columns(2)
-        with bisRulesCol:
-            businessRules = st.text_area("Business Rules",value = ebusinessRules, placeholder="Enter the detailed business rules", height =160)
-        with inputDataCol:
-            inputData = st.text_area("Input Data",value = einputData, placeholder="Enter the input data", height =160)
+    maRespCol, agentRespCol, taskRespCol = st.columns(3)
+    with maRespCol:
+        with st.container():
+            st.subheader("Master Agent")
+        with st.container(height=250, border=True):
+            st.markdown(masterAgentResp['value'])
+    with agentRespCol:
+        with st.container():
+            st.subheader("Worker Agent")
+        with st.container(height=250, border=True):
+            st.markdown(agentResp['value'])
+    with taskRespCol:
+        with st.container():
+            st.subheader("Task Details")
+        with st.container(height=250, border=True):
+            st.markdown(taskResp['value']) 
 
-    if(st.button('Initiate', type="secondary")):
-        masterAgentResp = master_agent_prompt_output(businessProfile, businessRules)
-        agentResp = worker_agents_prompt_output(businessProfile, businessRules, masterAgentResp['maResult'])
-        taskResp = task_prompt_output(businessProfile, masterAgentResp['maResult'], agentResp['agentResult'])          
-        finalOutput = multi_agent_crew(5, masterAgentResp['maResult'], agentResp['agentResult'], taskResp['taskResult'], inputData)         
-        st.divider()
-        st.header("Execution", divider="gray")
+    st.header("Final Output", divider="gray")           
 
-        maRespCol, agentRespCol, taskRespCol = st.columns(3)
-        with maRespCol:
-            with st.container():
-                st.subheader("Master Agent")
-            with st.container(height=250, border=True):
-                st.markdown(masterAgentResp['value'])
-        with agentRespCol:
-            with st.container():
-                st.subheader("Worker Agent")
-            with st.container(height=250, border=True):
-                st.markdown(agentResp['value'])
-        with taskRespCol:
-            with st.container():
-                st.subheader("Task Details")
-            with st.container(height=250, border=True):
-                st.markdown(taskResp['value']) 
-
-        st.header("Final Output", divider="gray")           
-
-        for currAgentOp in finalOutput:
-            with st.expander('Agent: ' + currAgentOp['agent']):
-                if currAgentOp['output'].startswith('json'):
-                    viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
-                    st.json(json.loads(viewJson))
-                else :
-                    st.markdown(currAgentOp['output'])
+    for currAgentOp in finalOutput:
+        with st.expander('Agent: ' + currAgentOp['agent']):
+            if currAgentOp['output'].startswith('json'):
+                viewJson = currAgentOp['output'][:len(currAgentOp['output'])]
+                st.json(json.loads(viewJson))
+            else :
+                st.markdown(currAgentOp['output'])
