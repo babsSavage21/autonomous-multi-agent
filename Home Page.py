@@ -17,21 +17,21 @@ st.title('Autonomous Multi-Agent Framework')
 st.subheader("*powered by IBM watsonx*", divider="gray")
 
 set1info = '''
-**Problem Statement: Limitations of Non-Autonomous Agentic Framework**
+<h4>Problem Statement: Limitations of Non-Autonomous Agentic Framework</h4>
 
-Agentic frameworks have greatly complemented Generative AI by enhancing its creativity, problem-solving capabilities, adaptability and efficiency. However, a non-autonomous agentic framework lacks the ability to make independent decisions or take actions without explicit instructions. Following are some of the major limitations.
-
-    1.<b>Lack of Flexibility:</b> As they follow pre-defined rules and instructions, hence they work within a boundary and lack the ability to initiate actions on their own.
-    2.<b>Dependency on External Input:</b> Performance of these agents is affected if the user’s input is unclear, incorrect, incomplete or delayed.
-    3.<b>Limited Creativity:</b> These agents might struggle with tasks that require creative problem-solving as they operate within the constraints of pre-defined rules and instructions.
-    3.<b>Limited Personalization:</b> Without autonomy, these agents may struggle to provide highly personalized experiences. They can't actively gather and utilize user-specific information to tailor their responses.
-    5.<b>Limited Generalization:</b> These agents may struggle to generalize knowledge from one domain to another, as they lack the autonomy to explore and learn from new environments.
-
+<div>Agentic frameworks have greatly complemented Generative AI by enhancing its creativity, problem-solving capabilities, adaptability and efficiency. However, a non-autonomous agentic framework lacks the ability to make independent decisions or take actions without explicit instructions. Following are some of the major limitations.</div>
+<ol>
+    <li><b>Lack of Flexibility:</b> As they follow pre-defined rules and instructions, hence they work within a boundary and lack the ability to initiate actions on their own.</li>
+    <li><b>Dependency on External Input:</b> Performance of these agents is affected if the user’s input is unclear, incorrect, incomplete or delayed.</li>
+    <li><b>Limited Creativity:</b> These agents might struggle with tasks that require creative problem-solving as they operate within the constraints of pre-defined rules and instructions.</li>
+    <li><b>Limited Personalization:</b> Without autonomy, these agents may struggle to provide highly personalized experiences. They can't actively gather and utilize user-specific information to tailor their responses.</li>
+    <li><b>Limited Generalization:</b> These agents may struggle to generalize knowledge from one domain to another, as they lack the autonomy to explore and learn from new environments.</li>
+</ol>
 Several multi-agent frameworks are available in the industry like CrewAI, LangGraph and IBM’s BeeAI. These frameworks provide different architectures for implementing multi-agent based applications, but none of them provides a fully autonomous agent.
 
-**Solution: Autonomous Multi-Agent Framework powered by IBM Watsonx**
+<h4>Solution: Autonomous Multi-Agent Framework powered by IBM Watsonx</h4>
 
-This integrated framework leverages IBM watsonx's Generative AI capabilities to enable dynamic creation of autonomous worker agents based on business profiles and business rules. In our approach, a sophisticated multi-agent framework, emerges as a singular, autonomous Master Agent that orchestrates the creation of worker agents and tasks at runtime to achieve the business objectives. Our approach uses CrewAI framework as the base to implement our framework. The same approach can be extended to other frameworks.
+<div>This integrated framework leverages IBM watsonx's Generative AI capabilities to enable dynamic creation of autonomous worker agents based on business profiles and business rules. In our approach, a sophisticated multi-agent framework, emerges as a singular, autonomous Master Agent that orchestrates the creation of worker agents and tasks at runtime to achieve the business objectives. Our approach uses CrewAI framework as the base to implement our framework. The same approach can be extended to other frameworks.</div>
 
 '''
 set2info = '''
@@ -85,6 +85,6 @@ We have provided implementation of two different use cases using the Autonomous 
 
 In the same way other use case can also be experimented with by selecting “New Run” and providing use case name, business profile, business rules and input data.        
 '''
-st.markdown(set1info, unsafe_allow_html=True)
+st.html(set1info)
 st.image("architecture.png", caption="Architecture Diagram")
 st.markdown(set2info, unsafe_allow_html=True)
