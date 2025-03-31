@@ -20,7 +20,7 @@ st.title('Autonomous Multi-Agent Framework')
 st.subheader("*powered by IBM watsonx*", divider="gray")
 
 set1info = '''
-<h3>Problem Statement: Limitations of Non-Autonomous Agentic Framework</h3>
+<h4>Problem Statement: Limitations of Non-Autonomous Agentic Framework</h4>
 
 Agentic frameworks have greatly complemented Generative AI by enhancing its creativity, problem-solving capabilities, adaptability and efficiency. However, a non-autonomous agentic framework lacks the ability to make independent decisions or take actions without explicit instructions. Following are some of the major limitations.
 <ol>
@@ -32,13 +32,13 @@ Agentic frameworks have greatly complemented Generative AI by enhancing its crea
 </ol>
 Several multi-agent frameworks are available in the industry like CrewAI, LangGraph and IBM’s BeeAI. These frameworks provide different architectures for implementing multi-agent based applications, but none of them provides a fully autonomous agent.
 
-<h3>Solution: Autonomous Multi-Agent Framework powered by IBM Watsonx</h3>
+<h4>Solution: Autonomous Multi-Agent Framework powered by IBM Watsonx</h4>
 
 This integrated framework leverages IBM watsonx's Generative AI capabilities to enable dynamic creation of autonomous worker agents based on business profiles and business rules. In our approach, a sophisticated multi-agent framework, emerges as a singular, autonomous Master Agent that orchestrates the creation of worker agents and tasks at runtime to achieve the business objectives. Our approach uses CrewAI framework as the base to implement our framework. The same approach can be extended to other frameworks.
 
 '''
 set2info = '''
-<h3>Key Components</h3>
+<h4>Key Components</h4>
 <ol>
     <li><b>Master Agent Development:</b> The Master Agent analyses and extracts objectives from user-provided business requirements and rules, decomposes those objectives into steps and creates an execution plan.</li>
     <li><b>Agent Creation:</b> The Master Agent dynamically creates worker agents at runtime based on the decomposed steps, generating details such as role, goal, and backstory for each worker agent.</li>
@@ -47,11 +47,11 @@ set2info = '''
     <li><b>Collaboration:</b> Through callback mechanism the Master Agent monitors the execution of the worker agents and enables sharing of information between worker agents ensuring successful execution of the entire operation.</li>
 </ol>
 
-<h3>Embracing the Future with Autonomous Agents</h3>
+<h4>Embracing the Future with Autonomous Agents</h4>
 
 This autonomous multi-agent framework can boost enterprise productivity and efficiency by streamlining processes, freeing up human workers for strategic tasks, and reducing costs. It can also enhance decision-making by analysing patterns and trends, and scale with your enterprise as it grows and adapts to changing demands.
 
-<h3>Role of watsonx.ai</h3>
+<h4>Role of watsonx.ai</h4>
 
 We have leveraged multiple capabilities and features of IBM watsonx.ai to build this autonomous multi-agent framework. Here is a detailed overview of the key components and integrations:
 <ol>
@@ -62,14 +62,14 @@ We have leveraged multiple capabilities and features of IBM watsonx.ai to build 
 </ol>
 By leveraging these advanced capabilities, we have created a robust and adaptable multi-agent framework that can dynamically respond to various business needs, ensuring enhanced efficiency and effectiveness in task execution.
 
-<h3>Issues Faced during Hackathon</h3>
+<h4>Issues Faced during Hackathon</h4>
 <ol>
     <li><b>Usage Limit:</b> During our implementation we reached 80% of our usage limit, due to which we could not experiment with other features like refinement of planning, usage of long-term / short-term memory, tool calling issues, etc. Also we could not test the framework for other business problems.</li>
     <li><b>Prompts as a Service:</b> IBM watsonx.ai also provisions the deployment of finalized prompts using the WML service. However, due to the constraints of the watsonx challenge environment, we were unable to create deployments. Therefore, the prompts as a service feature could not be fully utilized in this particular environment.</li>
     <li><b>Agent Governance:</b> We wanted to try out with Agent governance using watsonx.governance, as governance of autonomous agents is of utmost importance to ensure that Agents are consistent and predictable, maintain quality and relevance and are legal and ethical.</li>
 </ol>
 
-<h3>Live Demo</h3>
+<h4>Live Demo</h4>
 
 We have provided implementation of two different use cases using the Autonomous Multi-Agent framework. The details of the two use cases are:
 <ol>
