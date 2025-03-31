@@ -21,11 +21,11 @@ set1info = '''
 
 Agentic frameworks have greatly complemented Generative AI by enhancing its creativity, problem-solving capabilities, adaptability and efficiency. However, a non-autonomous agentic framework lacks the ability to make independent decisions or take actions without explicit instructions. Following are some of the major limitations.
 
-    1.**Lack of Flexibility:** As they follow pre-defined rules and instructions, hence they work within a boundary and lack the ability to initiate actions on their own.
-    2.**Dependency on External Input:** Performance of these agents is affected if the user’s input is unclear, incorrect, incomplete or delayed.
-    3.**Limited Creativity:** These agents might struggle with tasks that require creative problem-solving as they operate within the constraints of pre-defined rules and instructions.
-    3.**Limited Personalization:** Without autonomy, these agents may struggle to provide highly personalized experiences. They can't actively gather and utilize user-specific information to tailor their responses.
-    5.**Limited Generalization:** These agents may struggle to generalize knowledge from one domain to another, as they lack the autonomy to explore and learn from new environments.
+    1.<b>Lack of Flexibility:</b> As they follow pre-defined rules and instructions, hence they work within a boundary and lack the ability to initiate actions on their own.
+    2.<b>Dependency on External Input:</b> Performance of these agents is affected if the user’s input is unclear, incorrect, incomplete or delayed.
+    3.<b>Limited Creativity:</b> These agents might struggle with tasks that require creative problem-solving as they operate within the constraints of pre-defined rules and instructions.
+    3.<b>Limited Personalization:</b> Without autonomy, these agents may struggle to provide highly personalized experiences. They can't actively gather and utilize user-specific information to tailor their responses.
+    5.<b>Limited Generalization:</b> These agents may struggle to generalize knowledge from one domain to another, as they lack the autonomy to explore and learn from new environments.
 
 Several multi-agent frameworks are available in the industry like CrewAI, LangGraph and IBM’s BeeAI. These frameworks provide different architectures for implementing multi-agent based applications, but none of them provides a fully autonomous agent.
 
@@ -37,11 +37,11 @@ This integrated framework leverages IBM watsonx's Generative AI capabilities to 
 set2info = '''
 **Key Components**
 
-    1.**Master Agent Development:** The Master Agent analyses and extracts objectives from user-provided business requirements and rules, decomposes those objectives into steps and creates an execution plan.
-    2.**Agent Creation:** The Master Agent dynamically creates worker agents at runtime based on the decomposed steps, generating details such as role, goal, and backstory for each worker agent.
-    3.**Task Generation:** The Master Agent analyses the specifics of the assignment given to each worker agent, based on which it allocates tasks with descriptions and the expected output.
-    4.**Tool Calling:** The Master agent evaluates if the worker agents are self-sufficient to execute the task or they require external assistance. If deemed required, relevant tools are automatically selected from the Toolkit Library and instantiated and assigned to the agents for execution.
-    5.**Collaboration:** Through callback mechanism the Master Agent monitors the execution of the worker agents and enables sharing of information between worker agents ensuring successful execution of the entire operation.
+    1.<b>Master Agent Development:</b> The Master Agent analyses and extracts objectives from user-provided business requirements and rules, decomposes those objectives into steps and creates an execution plan.
+    2.<b>Agent Creation:</b> The Master Agent dynamically creates worker agents at runtime based on the decomposed steps, generating details such as role, goal, and backstory for each worker agent.
+    3.<b>Task Generation:</b> The Master Agent analyses the specifics of the assignment given to each worker agent, based on which it allocates tasks with descriptions and the expected output.
+    4.<b>Tool Calling:</b> The Master agent evaluates if the worker agents are self-sufficient to execute the task or they require external assistance. If deemed required, relevant tools are automatically selected from the Toolkit Library and instantiated and assigned to the agents for execution.
+    5.<b>Collaboration:</b> Through callback mechanism the Master Agent monitors the execution of the worker agents and enables sharing of information between worker agents ensuring successful execution of the entire operation.
 
 **Embracing the Future with Autonomous Agents**
 
@@ -50,23 +50,23 @@ This autonomous multi-agent framework can boost enterprise productivity and effi
 **Role of watsonx.ai**
 
 We have leveraged multiple capabilities and features of IBM watsonx.ai to build this autonomous multi-agent framework. Here is a detailed overview of the key components and integrations:
-    1.**Prompt Lab:** Custom prompts are crafted in the Prompt Lab using the "granite-3-2-8b-instruct" model. This enables the dynamic creation of autonomous worker agents, tasks, and identification of tools based on the business profile and business rules provided as input by the user. The Prompt Lab facilitates the generation of highly tailored and contextually relevant prompts, ensuring that the agents are well-equipped to handle specific business needs.
-    2.**IBM watsonx.ai and CrewAI Integration:** The multi-agent framework, comprising dynamic agents, tasks, in-built tools, and custom tools, is built, orchestrated, and executed using CrewAI in integration with IBM watsonx.ai's "granite-3-2-8b-instruct" model. This model supports enhanced reasoning capabilities, making it ideal for creating autonomous agents with configurable thinking capabilities. This means the reasoning can be controlled and applied as needed, ensuring optimal performance and adaptability.
-    3.**Prompt Executing & LLM Inferencing:** The watsonx.ai Runtime service offered by IBM watsonx.ai is used to execute the designed prompts as well as the crew. This service ensures seamless execution and integration, allowing the agents to perform their tasks efficiently and effectively.
-    4.**watsonx.ai Studio:** IBM watsonx.ai provides a studio where we can design and implement our solutions. We have extensively used Jupyter notebooks to develop our application code and test the outcomes before deployment.
+    1.<b>Prompt Lab:</b> Custom prompts are crafted in the Prompt Lab using the "granite-3-2-8b-instruct" model. This enables the dynamic creation of autonomous worker agents, tasks, and identification of tools based on the business profile and business rules provided as input by the user. The Prompt Lab facilitates the generation of highly tailored and contextually relevant prompts, ensuring that the agents are well-equipped to handle specific business needs.
+    2.<b>IBM watsonx.ai and CrewAI Integration:</b> The multi-agent framework, comprising dynamic agents, tasks, in-built tools, and custom tools, is built, orchestrated, and executed using CrewAI in integration with IBM watsonx.ai's "granite-3-2-8b-instruct" model. This model supports enhanced reasoning capabilities, making it ideal for creating autonomous agents with configurable thinking capabilities. This means the reasoning can be controlled and applied as needed, ensuring optimal performance and adaptability.
+    3.<b>Prompt Executing & LLM Inferencing:</b> The watsonx.ai Runtime service offered by IBM watsonx.ai is used to execute the designed prompts as well as the crew. This service ensures seamless execution and integration, allowing the agents to perform their tasks efficiently and effectively.
+    4.<b>watsonx.ai Studio:</b> IBM watsonx.ai provides a studio where we can design and implement our solutions. We have extensively used Jupyter notebooks to develop our application code and test the outcomes before deployment.
 By leveraging these advanced capabilities, we have created a robust and adaptable multi-agent framework that can dynamically respond to various business needs, ensuring enhanced efficiency and effectiveness in task execution.
 
 **Issues Faced during Hackathon**
 
-    1.**Usage Limit:** During our implementation we reached 80% of our usage limit, due to which we could not experiment with other features like refinement of planning, usage of long-term / short-term memory, tool calling issues, etc. Also we could not test the framework for other business problems.
-    2.**Prompts as a Service:** IBM watsonx.ai also provisions the deployment of finalized prompts using the WML service. However, due to the constraints of the watsonx challenge environment, we were unable to create deployments. Therefore, the prompts as a service feature could not be fully utilized in this particular environment.
-    3.**Agent Governance:** We wanted to try out with Agent governance using watsonx.governance, as governance of autonomous agents is of utmost importance to ensure that Agents are consistent and predictable, maintain quality and relevance and are legal and ethical.
+    1.<b>Usage Limit:</b> During our implementation we reached 80% of our usage limit, due to which we could not experiment with other features like refinement of planning, usage of long-term / short-term memory, tool calling issues, etc. Also we could not test the framework for other business problems.
+    2.<b>Prompts as a Service:</b> IBM watsonx.ai also provisions the deployment of finalized prompts using the WML service. However, due to the constraints of the watsonx challenge environment, we were unable to create deployments. Therefore, the prompts as a service feature could not be fully utilized in this particular environment.
+    3.<b>Agent Governance:</b> We wanted to try out with Agent governance using watsonx.governance, as governance of autonomous agents is of utmost importance to ensure that Agents are consistent and predictable, maintain quality and relevance and are legal and ethical.
 
 **Live Demo**
 
 We have provided implementation of two different use cases using the Autonomous Multi-Agent framework. The details of the two use cases are:
 
-    1.**Smart Assistant Test Automation:** This use case automates the testing of smart assistants.
+    1.<b>Smart Assistant Test Automation:</b> This use case automates the testing of smart assistants.
         a. It reads the folder to establish the knowledge base using the FileReadTool of CrewAI
         b. Generates questions which can be asked by users to the smart assistant.
         c. Since the same question can be asked in a different way by different users, hence it creates alternative questions.
@@ -74,7 +74,7 @@ We have provided implementation of two different use cases using the Autonomous 
         e. It mimics a smart assistant and generates answers for the generated questions.
         f. Finally, it uses semantic similarity matching to evaluate the smart assistants’ answers with the ground truth to generate the test result.
     
-    2.**Product Review System:** This use case performs analytics on customer reviews.
+    2.<b>Product Review System:</b> This use case performs analytics on customer reviews.
         a. Fetches the product reviews from the provided link using a custom tool
         b. Classifies the review as Positive, Negative or Neutral
         c. Uses the positive reviews to generate the positive review summary
@@ -85,6 +85,6 @@ We have provided implementation of two different use cases using the Autonomous 
 
 In the same way other use case can also be experimented with by selecting “New Run” and providing use case name, business profile, business rules and input data.        
 '''
-st.markdown(set1info)
+st.markdown(set1info, unsafe_allow_html=True)
 st.image("architecture.png", caption="Architecture Diagram")
-st.markdown(set2info)
+st.markdown(set2info, unsafe_allow_html=True)
