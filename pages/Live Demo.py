@@ -505,7 +505,9 @@ else :
             automultiagentselect()
 
     selectedOption = st.session_state.automultiagentselect['selected']
+    st.write(st.session_state)
     del st.session_state['automultiagentselect']
+    del st.session_state['userSelection']
     if selectedOption == 'New Run':
         usecaseName = st.text_input("Usecase Name", placeholder="Enter the name of the use case")
         businessProfile = st.text_area("Business Profile", placeholder="Enter the detailed business profile", height =68)
