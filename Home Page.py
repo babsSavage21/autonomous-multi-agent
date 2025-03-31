@@ -50,9 +50,13 @@ set2info = '''
 <h4>Embracing the Future with Autonomous Agents</h4>
 
 This autonomous multi-agent framework can boost enterprise productivity and efficiency by streamlining processes, freeing up human workers for strategic tasks, and reducing costs. It can also enhance decision-making by analysing patterns and trends, and scale with your enterprise as it grows and adapts to changing demands.
+
+<h4>Demonstration Video</h4>
+
 '''
 
 set3info = '''
+
 <h4>Role of watsonx.ai</h4>
 
 We have leveraged multiple capabilities and features of IBM watsonx.ai to build this autonomous multi-agent framework. Here is a detailed overview of the key components and integrations:
@@ -102,7 +106,7 @@ In the same way other use case can also be experimented with by selecting “New
 
 <h5>Team Members</h5>
 <ul>
-    <li>Mahesh Ray</li>
+    <li>Mahesh Prasad Ray (Team Lead)</li>
     <li>Dr. Prabhat Kumar Santi</li>
     <li>Namrata Panda</li>
     <li>Prajjal Dasverma</li>
