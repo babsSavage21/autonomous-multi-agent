@@ -39,7 +39,8 @@ st.html("""
     </style>
     """
 )
-st.title('Autonomous Multi Agent Framwork')
+st.title('Autonomous Multi-Agent Framework')
+st.subheader("*powered by IBM watsonx*", divider="gray")
 
 def get_credentials():
     return {
@@ -430,7 +431,7 @@ def multi_agent_crew(max_iter, maResult, agentResult, taskResult, userQuery):
 
 def getExampleSet(setName):
     if setName == 'Example1':
-        ucName = 'Automated Smart Test Assistant'
+        ucName = 'Smart Assistant Test Automation'
         businessProfile= 'A software assurance provider which provides services on software testing including web applications, smart assistants, chatbots, etc. The organization specializes in automating test case scenario generation for Generative AI based smart assistants. They use Generative AI large language models to generate test cases ensuring a full coverage of the knowledge base'
         businessRules = '''1. Fetch the file from the path provided in the input. Read the content of the file and assign the extracted content as the knowledge base. Use the knowledge base to execute the below steps.
 
@@ -479,7 +480,7 @@ X (Twitter) Text
 @st.dialog("Select")
 def automultiagentselect():
     selection_options = {
-    1: "Automated Smart Test Assistant",
+    1: "Smart Assistant Test Automation",
     2: "Product Review System",
     3: "New Run",
     }
