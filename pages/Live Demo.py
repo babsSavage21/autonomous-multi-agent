@@ -501,7 +501,7 @@ def automultiagentselect():
 if "automultiagentselect" not in st.session_state:
     automultiagentselect()
 else :
-    if(st.button('Select Example', type="prinary")):
+    if(st.button('Select Example', type="primary")):
         if "automultiagentselect" not in st.session_state:
             automultiagentselect()
     else :
