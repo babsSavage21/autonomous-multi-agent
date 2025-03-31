@@ -6,7 +6,7 @@ st.set_page_config(
 st.html("""
     <style>
         .stMainBlockContainer {
-            max-width:80rem;
+            max-width:90rem;
         }
 
         ol {
