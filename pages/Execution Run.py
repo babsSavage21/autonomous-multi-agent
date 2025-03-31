@@ -19,7 +19,7 @@ import pandas as pd
 import re
 
 model_id = "ibm/granite-3-2-8b-instruct"
-project_id = '7e4954e5-30e3-47a3-a156-c8b3b84da7e9'
+project_id = 'a214617b-97d6-4aef-b555-876bf9385684'
 
 parameters = {
     "decoding_method": "greedy",
@@ -44,7 +44,7 @@ st.title('Autonomous Multi Agent Framwork')
 def get_credentials():
     return {
         "url" : "https://us-south.ml.cloud.ibm.com",
-        "apikey" : "szAY0l-S9imIeyTUyn3zq5VlTlglzIqKLDJGnefWr6SZ"
+        "apikey" : "gO-c7N7a44R81zutKkX4cR059Kb3ObI_xA4jKUs_BRfA"
     }
 
 def get_llm_models(model_id, parameters, project_id):
@@ -345,7 +345,7 @@ def multi_agent_crew(max_iter, maResult, agentResult, taskResult, userQuery):
             max_tokens=4000,
             temperature=0,
             api_base = "https://us-south.ml.cloud.ibm.com",
-            api_key= "szAY0l-S9imIeyTUyn3zq5VlTlglzIqKLDJGnefWr6SZ",
+            api_key= "gO-c7N7a44R81zutKkX4cR059Kb3ObI_xA4jKUs_BRfA",
             project_id = project_id
         )
       
