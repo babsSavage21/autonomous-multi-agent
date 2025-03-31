@@ -152,13 +152,11 @@ def main(search_url):
     reviews = get_reviews(soup)
     for review in reviews:
         review_content.append(review['content'])
-    print("Review Content: ",review_content)
     final_json = {
         "productname":title,
         "productdescription":description,
         "productreviews":review_content
     }
-    print("final_json : ",final_json)
     df = pd.DataFrame(final_json)
 
     return(df)
@@ -284,7 +282,7 @@ def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
         agent_name = agent_result_json['worker_agent']['name']
         agent_role = agent_result_json['worker_agent']['role']
         agent_goal = agent_result_json['worker_agent']['goal']
-        final_agent_config += ":blue["+agent_name.upper() + "]\n\n" + "**Role:**" + agent_role + "\n\n" + "**Goal:** " + agent_goal + "\n\n\n"
+        final_agent_config += ":blue["+agent_name.upper() + "]\n\n" + "**Role:** " + agent_role + "\n\n" + "**Goal:** " + agent_goal + "\n\n\n"
 
         final_agent_result.append(agent_result)
 
