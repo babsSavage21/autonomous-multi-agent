@@ -283,7 +283,7 @@ def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
         agent_name = agent_result_json['worker_agent']['name']
         agent_role = agent_result_json['worker_agent']['role']
         agent_goal = agent_result_json['worker_agent']['goal']
-        final_agent_config += ":blue["+agent_name.upper() + "]\n\n" + "**Role: **" + agent_role + "\n\n" + "**Goal:** " + agent_goal + "\n\n\n"
+        final_agent_config += ":blue["+agent_name.upper() + "]\n\n" + "**Role:**" + agent_role + "\n\n" + "**Goal:** " + agent_goal + "\n\n\n"
 
         final_agent_result.append(agent_result)
 
