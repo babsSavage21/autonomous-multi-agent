@@ -283,7 +283,7 @@ def worker_agents_prompt_output(companyProfile, BusinessRule, ma_result):
         agent_name = agent_result_json['worker_agent']['name']
         agent_role = agent_result_json['worker_agent']['role']
         agent_goal = agent_result_json['worker_agent']['goal']
-        final_agent_config += ":blue["+agent_name.upper() + "]\n\n" + "Role: " + agent_role + "\n\n" + "Goal: " + agent_goal + "\n\n\n"
+        final_agent_config += ":blue["+agent_name.upper() + "]\n\n" + "**Role: **" + agent_role + "\n\n" + "**Goal:** " + agent_goal + "\n\n\n"
 
         final_agent_result.append(agent_result)
 
@@ -323,7 +323,7 @@ def task_prompt_output(companyProfile, ma_result, agent_result):
         task_result_json = json.loads(task_result)
         task_desc = task_result_json['task_description']
         task_exp_output = task_result_json['expected_output']
-        final_task_config += ":blue["+role.upper() + "]\n\n\n" + "Description: " + "\n\n" + task_desc + "\n\n" + "Expected Output: " + "\n\n" + str(task_exp_output) + "\n\n\n\n"
+        final_task_config += ":blue["+role.upper() + "]\n\n\n" + "**Description:** " + "\n\n" + task_desc + "\n\n" + "**Expected Output:** " + "\n\n" + str(task_exp_output) + "\n\n\n\n"
 
         final_task_result.append(task_result)
         
