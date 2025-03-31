@@ -252,7 +252,7 @@ Output:"""
     for val in ma_result_json['worker_agents']:
         worker_agent_name = val['name']
         worker_agent_task = val['task']
-        final_ma_config += "Worker Agent: :blue[" + worker_agent_name + "]\n\n" + "Task: :blue[" + worker_agent_task + "]\n\n\n"
+        final_ma_config += "Worker Agent: :blue[" + worker_agent_name + "]\n\n" + "Task: :violet[" + worker_agent_task + "]\n\n\n"
 
     
     ma_resp_json = {
@@ -324,7 +324,7 @@ def task_prompt_output(companyProfile, ma_result, agent_result):
         task_result_json = json.loads(task_result)
         task_desc = task_result_json['task_description']
         task_exp_output = task_result_json['expected_output']
-        final_task_config += ":blue["+role.upper() + "]\n\n\n" + "**Description:** " + "\n\n" + task_desc + "\n\n" + "**Expected Output:** " + "\n\n" + str(task_exp_output) + "\n\n\n\n"
+        final_task_config += ":violet["+role.upper() + "]\n\n\n" + "**Description:** " + "\n\n" + task_desc + "\n\n" + "**Expected Output:** " + "\n\n" + str(task_exp_output) + "\n\n\n\n"
 
         final_task_result.append(task_result)
         

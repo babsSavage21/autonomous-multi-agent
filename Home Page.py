@@ -84,6 +84,7 @@ We have provided implementation of two different use cases using the Autonomous 
         </ul>
     </li>
     <li><b>Product Review System:</b> This use case performs analytics on customer reviews.
+        <ul>
         <li> Fetches the product reviews from the provided link using a custom tool</li>
         <li> Classifies the review as Positive, Negative or Neutral</li>
         <li> Uses the positive reviews to generate the positive review summary</li>
@@ -91,6 +92,7 @@ We have provided implementation of two different use cases using the Autonomous 
         <li> Extracts product features from reviews and classifies them as positive or negative</li>
         <li> Generates a summarized product review</li>
         <li> Generates Search Engine Optimization (SEO) content</li>
+        </ul>
     </li>
 </ol>
 In the same way other use case can also be experimented with by selecting “New Run” and providing use case name, business profile, business rules and input data.        
