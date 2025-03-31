@@ -112,5 +112,5 @@ In the same way other use case can also be experimented with by selecting “New
 st.markdown(set1info, unsafe_allow_html=True)
 st.image("architecture.png", caption="Architecture Diagram")
 st.markdown(set2info, unsafe_allow_html=True)
-st.video("https://www.youtube.com/watch?v=ALxxlma-SV8")
+st.video("https://youtu.be/o68dhHfEYos")
 st.markdown(set3info, unsafe_allow_html=True)
