@@ -8,6 +8,10 @@ st.html("""
         .stMainBlockContainer {
             max-width:70rem;
         }
+
+        ol {
+            padding-left: 40px;
+        }
     </style>
     """
 )
@@ -17,7 +21,7 @@ st.title('Autonomous Multi-Agent Framework')
 st.subheader("*powered by IBM watsonx*", divider="gray")
 
 set1info = '''
-<h4>Problem Statement: Limitations of Non-Autonomous Agentic Framework</h4>
+<h3>Problem Statement: Limitations of Non-Autonomous Agentic Framework</h3>
 
 <div>Agentic frameworks have greatly complemented Generative AI by enhancing its creativity, problem-solving capabilities, adaptability and efficiency. However, a non-autonomous agentic framework lacks the ability to make independent decisions or take actions without explicit instructions. Following are some of the major limitations.</div>
 <ol>
@@ -29,7 +33,7 @@ set1info = '''
 </ol>
 Several multi-agent frameworks are available in the industry like CrewAI, LangGraph and IBM’s BeeAI. These frameworks provide different architectures for implementing multi-agent based applications, but none of them provides a fully autonomous agent.
 
-<h4>Solution: Autonomous Multi-Agent Framework powered by IBM Watsonx</h4>
+<h3>Solution: Autonomous Multi-Agent Framework powered by IBM Watsonx</h3>
 
 <div>This integrated framework leverages IBM watsonx's Generative AI capabilities to enable dynamic creation of autonomous worker agents based on business profiles and business rules. In our approach, a sophisticated multi-agent framework, emerges as a singular, autonomous Master Agent that orchestrates the creation of worker agents and tasks at runtime to achieve the business objectives. Our approach uses CrewAI framework as the base to implement our framework. The same approach can be extended to other frameworks.</div>
 
