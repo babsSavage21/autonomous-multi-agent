@@ -13,7 +13,7 @@ st.html("""
 )
 
 
-st.title('Autonomous Multi Agent Framwork')
+st.title('Autonomous Multi-Agent Framework')
 st.subheader("*powered by IBM watsonx*", divider="gray")
 
 st.markdown("*Streamlit* is **really** ***cool***.")
